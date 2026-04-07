@@ -1,107 +1,392 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
-
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background: #f4f7fb;
       margin: 0;
       padding: 0;
+      color: #1f2937;
     }
-
     .container {
-      max-width: 600px;
-      margin: 50px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
+      max-width: 760px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
-
-    input, select, button {
+    h1 {
+      margin-top: 0;
+      color: #111827;
+    }
+    p {
+      color: #4b5563;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      box-sizing: border-box;
     }
-
     button {
-      background: black;
+      margin-top: 16px;
+      width: 100%;
+      padding: 14px;
+      background: #111827;
       color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
       cursor: pointer;
     }
-
-    .result {
+    button:hover {
+      background: #1f2937;
+    }
+    .secondary {
+      background: #2563eb;
+    }
+    .secondary:hover {
+      background: #1d4ed8;
+    }
+    .paypal {
+      background: #0070ba;
+    }
+    .paypal:hover {
+      background: #005f99;
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .result, .status, .invoice-box {
       margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .result {
+      font-size: 20px;
       font-weight: bold;
+    }
+    .status {
+      white-space: pre-line;
+      font-size: 14px;
+    }
+    .invoice-box div {
+      margin: 6px 0;
+    }
+    @media (max-width: 700px) {
+      .container { margin: 20px; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
+  <div class="container">
+    <h1>Proconvoi17</h1>
+    <p>Devis convoyage, sauvegarde, facture PDF et envoi email.</p>
 
-<div class="container">
-  <h1>Proconvoi17</h1>
-  <p>Calcul rapide de devis convoyage</p>
+    <div class="grid">
+      <div>
+        <label for="clientName">Nom du client</label>
+        <input id="clientName" type="text" placeholder="Ex: Jean Dupont" />
+      </div>
+      <div>
+        <label for="clientEmail">Email du client</label>
+        <input id="clientEmail" type="email" placeholder="client@email.com" />
+      </div>
+      <div>
+        <label for="clientPhone">Téléphone</label>
+        <input id="clientPhone" type="text" placeholder="Ex: 0612345678" />
+      </div>
+      <div>
+        <label for="company">Société</label>
+        <input id="company" type="text" placeholder="Ex: Transports Martin" />
+      </div>
+    </div>
 
-  <label>Type de véhicule</label>
-  <select id="type">
-    <option value="0.98">VL - 0,98 €/km</option>
-    <option value="1.2">Utilitaire - 1,20 €/km</option>
-  </select>
+    <label for="type">Type de véhicule</label>
+    <select id="type">
+      <option value="0.98">VL - 0,98 €/km</option>
+      <option value="2.2">PL / SPL - 2,20 €/km</option>
+    </select>
 
-  <label>Distance (km)</label>
-  <input id="km" type="number" placeholder="Ex: 150">
+    <label for="km">Distance en kilomètres</label>
+    <input id="km" type="number" placeholder="Ex: 150" />
 
-  <button onclick="calculer()">Calculer le devis</button>
+    <label for="message">Informations complémentaires</label>
+    <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
 
-  <div id="resultat" class="result">
-    Montant estimatif : 0,00 €
+    <button onclick="calculer()">Calculer et sauvegarder</button>
+    <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
+    <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
+    <button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
+
+    <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
+
+    <div class="invoice-box">
+      <div><strong>Numéro de facture :</strong> <span id="invoiceNumber">-</span></div>
+      <div><strong>Statut email :</strong> <span id="emailStatus">Non envoyé</span></div>
+    </div>
+
+    <div class="status" id="status">Statut : en attente</div>
   </div>
-</div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-<script>
-const supabaseClient = supabase.createClient(
-  "https://znodbkoakkaucxikkway.supabase.co",
-  "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-);
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://znodbkoakkaucxikkway.supabase.co",
+      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+    );
 
-async function calculer() {
-  const km = parseFloat(document.getElementById('km').value) || 0;
-  const tarif = parseFloat(document.getElementById('type').value) || 0;
+    const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
+    const PAYPAL_BASE = "https://paypal.me/proconvoi";
 
-  const base = km * tarif;
-  const frais = base * 0.26;
-  const total = base + frais;
+    let derniereFacture = null;
 
-  document.getElementById('resultat').innerText =
-    "Montant estimatif : " + total.toFixed(2).replace('.', ',') + " €";
+    function euro(v) {
+      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+    }
 
-  // 🔥 ENREGISTRE DANS SUPABASE
-  const { error } = await supabaseClient
-    .from("invoices")
-    .insert([
-      {
-        client_email: "test@test.com",
-        base_amount: base,
-        fees_amount: frais,
-        total_amount: total
+    function montantPaypal(v) {
+      return Number(v || 0).toFixed(2);
+    }
+
+    function buildInvoiceNumber() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const stamp = String(Date.now()).slice(-6);
+      return `FAC-${year}-${stamp}`;
+    }
+
+    function lireFormulaire() {
+      return {
+        clientName: document.getElementById("clientName").value.trim(),
+        clientEmail: document.getElementById("clientEmail").value.trim(),
+        clientPhone: document.getElementById("clientPhone").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        vehicleText: document.getElementById("type").selectedOptions[0].text,
+        tarif: parseFloat(document.getElementById("type").value) || 0,
+        km: parseFloat(document.getElementById("km").value) || 0,
+        message: document.getElementById("message").value.trim()
+      };
+    }
+
+    function calculMontants() {
+      const form = lireFormulaire();
+      const base = form.km * form.tarif;
+      const frais = base * 0.26;
+      const total = base + frais;
+      return { ...form, base, frais, total };
+    }
+
+    function majAffichage(result) {
+      document.getElementById("resultat").innerText = "Montant estimatif : " + euro(result.total);
+      if (derniereFacture?.invoice_number) {
+        document.getElementById("invoiceNumber").innerText = derniereFacture.invoice_number;
       }
-    ]);
+      document.getElementById("emailStatus").innerText = derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
+    }
 
-  if (error) {
-    console.error("❌ Erreur:", error);
-  } else {
-    console.log("✅ Sauvegardé !");
-  }
-}
-</script>
+    async function calculer() {
+      const result = calculMontants();
 
+      if (!result.clientName || !result.clientEmail || !result.km) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner le nom, l’email et la distance.";
+        return;
+      }
+
+      const invoiceNumber = buildInvoiceNumber();
+
+      const payload = {
+        invoice_number: invoiceNumber,
+        created_at_label: new Date().toLocaleDateString("fr-FR"),
+        service_type: "convoyage",
+        vehicle_type: result.vehicleText,
+        distance_km: result.km,
+        client_name: result.clientName,
+        company: result.company,
+        client_email: result.clientEmail,
+        client_phone: result.clientPhone,
+        message: result.message,
+        base_amount: result.base,
+        fees_amount: result.frais,
+        total_amount: result.total,
+        email_sent: false
+      };
+
+      const { data, error } = await supabaseClient
+        .from("invoices")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("❌ Erreur Supabase:", error);
+        document.getElementById("status").innerText =
+          "Statut : erreur de sauvegarde.\n" + error.message;
+        return;
+      }
+
+      derniereFacture = data;
+      majAffichage(result);
+
+      document.getElementById("status").innerText =
+        "Statut : devis sauvegardé.\nFacture : " + data.invoice_number;
+    }
+
+    function genererPdfBlob() {
+      if (!derniereFacture) return null;
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      let y = 20;
+      const add = (txt, jump = 8) => {
+        pdf.text(String(txt), 20, y);
+        y += jump;
+      };
+
+      pdf.setFontSize(18);
+      add("FACTURE", 12);
+
+      pdf.setFontSize(11);
+      add("Proconvoi17");
+      add("SIRET : 532 293 461 00044");
+      add("Téléphone : 0763082637");
+      add("Email : mickaelple066@gmail.com");
+      y += 4;
+
+      add("Facture n° : " + (derniereFacture.invoice_number || "-"));
+      add("Date : " + (derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")));
+      y += 4;
+
+      add("Client : " + (derniereFacture.client_name || "-"));
+      add("Email client : " + (derniereFacture.client_email || "-"));
+      add("Téléphone client : " + (derniereFacture.client_phone || "-"));
+      add("Société : " + (derniereFacture.company || "-"));
+      y += 4;
+
+      add("Type de véhicule : " + (derniereFacture.vehicle_type || "-"));
+      add("Distance : " + (derniereFacture.distance_km || 0) + " km");
+      add("Base : " + euro(derniereFacture.base_amount));
+      add("Frais de route (26%) : " + euro(derniereFacture.fees_amount));
+      add("Total : " + euro(derniereFacture.total_amount));
+      y += 4;
+
+      add("Informations : " + (derniereFacture.message || "Aucune"));
+      add("TVA non applicable, article 293 B du CGI.");
+
+      return pdf.output("blob");
+    }
+
+    async function telechargerFacture() {
+      if (!derniereFacture) {
+        document.getElementById("status").innerText =
+          "Statut : calcule d’abord le devis.";
+        return;
+      }
+
+      const blob = genererPdfBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${derniereFacture.invoice_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      document.getElementById("status").innerText =
+        "Statut : facture PDF téléchargée.";
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = String(reader.result || "");
+          resolve(result.split(",")[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function envoyerFacture() {
+      if (!derniereFacture) {
+        document.getElementById("status").innerText =
+          "Statut : calcule d’abord le devis avant l’envoi.";
+        return;
+      }
+
+      try {
+        const pdfBlob = genererPdfBlob();
+        const pdfBase64 = await blobToBase64(pdfBlob);
+
+        const response = await fetch(EMAIL_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            to: derniereFacture.client_email,
+            subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
+            text:
+              "Bonjour " + derniereFacture.client_name + ",\n\n" +
+              "Veuillez trouver votre facture " + derniereFacture.invoice_number +
+              " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
+              "Cordialement,\nProconvoi17",
+            filename: derniereFacture.invoice_number + ".pdf",
+            pdfBase64
+          })
+        });
+
+        if (!response.ok) {
+          const txt = await response.text();
+          throw new Error(txt || "Échec d'envoi");
+        }
+
+        await supabaseClient
+          .from("invoices")
+          .update({ email_sent: true })
+          .eq("id", derniereFacture.id);
+
+        derniereFacture.email_sent = true;
+        document.getElementById("emailStatus").innerText = "Envoyé";
+        document.getElementById("status").innerText =
+          "Statut : facture envoyée par email à " + derniereFacture.client_email;
+      } catch (err) {
+        console.error("❌ Erreur email:", err);
+        document.getElementById("status").innerText =
+          "Statut : erreur d’envoi email.\n" + err.message;
+      }
+    }
+
+    function payerPaypal() {
+      const result = calculMontants();
+      if (!result.km) {
+        document.getElementById("status").innerText =
+          "Statut : renseigne la distance avant paiement.";
+        return;
+      }
+      window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
+    }
+  </script>
 </body>
 </html>
