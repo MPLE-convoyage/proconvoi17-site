@@ -158,6 +158,9 @@
     const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
     const PAYPAL_BASE = "https://paypal.me/proconvoi";
 
+    const SUPABASE_ANON_JWT =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
+
     let derniereFacture = null;
 
     function euro(v) {
@@ -344,11 +347,11 @@
 
         const response = await fetch(EMAIL_ENDPOINT, {
           method: "POST",
-          headers: headers: {
-  "Content-Type": "application/json",
-  "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk",
-  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk"
-},
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_JWT,
+            "Authorization": "Bearer " + SUPABASE_ANON_JWT
+          },
           body: JSON.stringify({
             to: derniereFacture.client_email,
             subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
@@ -363,6 +366,7 @@
         });
 
         const responseText = await response.text();
+
         if (!response.ok) {
           throw new Error("HTTP " + response.status + " - " + responseText);
         }
