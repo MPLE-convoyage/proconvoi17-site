@@ -355,7 +355,25 @@
             filename: derniereFacture.invoice_number + ".pdf",
             pdfBase64
           })
-        });
+        });const response = await fetch(EMAIL_ENDPOINT, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
+    "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+  },
+  body: JSON.stringify({
+    to: derniereFacture.client_email,
+    subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
+    text:
+      "Bonjour " + derniereFacture.client_name + ",\n\n" +
+      "Veuillez trouver votre facture " + derniereFacture.invoice_number +
+      " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
+      "Cordialement,\nProconvoi17",
+    filename: derniereFacture.invoice_number + ".pdf",
+    pdfBase64
+  })
+});
 
         if (!response.ok) {
           const txt = await response.text();
