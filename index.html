@@ -147,203 +147,252 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-  <script>
-    const supabaseClient = supabase.createClient(
-      "https://znodbkoakkaucxikkway.supabase.co",
-      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-    );
+<script>
+const supabaseClient = supabase.createClient(
+  "https://znodbkoakkaucxikkway.supabase.co",
+  "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+);
 
-    const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
-    const PAYPAL_BASE = "https://paypal.me/proconvoi";
+const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
+const PAYPAL_BASE = "https://paypal.me/proconvoi";
 
-    let derniereFacture = null;
+let derniereFacture = null;
 
-    function euro(v) {
-      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+function euro(v) {
+  return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+}
+
+function montantPaypal(v) {
+  return Number(v || 0).toFixed(2);
+}
+
+function buildInvoiceNumber() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const stamp = String(Date.now()).slice(-6);
+  return `FAC-${year}-${stamp}`;
+}
+
+function lireFormulaire() {
+  return {
+    clientName: document.getElementById("clientName").value.trim(),
+    clientEmail: document.getElementById("clientEmail").value.trim(),
+    clientPhone: document.getElementById("clientPhone").value.trim(),
+    company: document.getElementById("company").value.trim(),
+    vehicleText: document.getElementById("type").selectedOptions[0].text,
+    tarif: parseFloat(document.getElementById("type").value) || 0,
+    km: parseFloat(document.getElementById("km").value) || 0,
+    message: document.getElementById("message").value.trim()
+  };
+}
+
+function calculMontants() {
+  const form = lireFormulaire();
+  const base = form.km * form.tarif;
+  const frais = base * 0.26;
+  const total = base + frais;
+  return { ...form, base, frais, total };
+}
+
+function majAffichage(result) {
+  document.getElementById("resultat").innerText =
+    "Montant estimatif : " + euro(result.total);
+
+  document.getElementById("invoiceNumber").innerText =
+    derniereFacture?.invoice_number || "-";
+
+  document.getElementById("emailStatus").innerText =
+    derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
+}
+
+async function calculer() {
+  const result = calculMontants();
+
+  if (!result.clientName || !result.clientEmail || !result.km) {
+    document.getElementById("status").innerText =
+      "Statut : merci de renseigner le nom, l’email et la distance.";
+    return;
+  }
+
+  const invoiceNumber = buildInvoiceNumber();
+
+  const payload = {
+    invoice_number: invoiceNumber,
+    created_at_label: new Date().toLocaleDateString("fr-FR"),
+    service_type: "convoyage",
+    vehicle_type: result.vehicleText,
+    distance_km: result.km,
+    client_name: result.clientName,
+    company: result.company,
+    client_email: result.clientEmail,
+    client_phone: result.clientPhone,
+    message: result.message,
+    base_amount: result.base,
+    fees_amount: result.frais,
+    total_amount: result.total,
+    email_sent: false
+  };
+
+  const { data, error } = await supabaseClient
+    .from("invoices")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("❌ Erreur Supabase:", error);
+    document.getElementById("status").innerText =
+      "Statut : erreur de sauvegarde.\n" + error.message;
+    return;
+  }
+
+  derniereFacture = data;
+  majAffichage(result);
+
+  document.getElementById("status").innerText =
+    "Statut : devis sauvegardé.\nFacture : " + data.invoice_number;
+}
+
+function genererPdfBlob() {
+  if (!derniereFacture) return null;
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  let y = 20;
+  const add = (txt, jump = 8) => {
+    pdf.text(String(txt), 20, y);
+    y += jump;
+  };
+
+  pdf.setFontSize(18);
+  add("FACTURE", 12);
+
+  pdf.setFontSize(11);
+  add("Proconvoi17");
+  add("SIRET : 532 293 461 00044");
+  add("Téléphone : 0763082637");
+  add("Email : mickaelple066@gmail.com");
+  y += 4;
+
+  add("Facture n° : " + (derniereFacture.invoice_number || "-"));
+  add("Date : " + (derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")));
+  y += 4;
+
+  add("Client : " + (derniereFacture.client_name || "-"));
+  add("Email client : " + (derniereFacture.client_email || "-"));
+  add("Téléphone client : " + (derniereFacture.client_phone || "-"));
+  add("Société : " + (derniereFacture.company || "-"));
+  y += 4;
+
+  add("Type de véhicule : " + (derniereFacture.vehicle_type || "-"));
+  add("Distance : " + (derniereFacture.distance_km || 0) + " km");
+  add("Base : " + euro(derniereFacture.base_amount));
+  add("Frais de route (26%) : " + euro(derniereFacture.fees_amount));
+  add("Total : " + euro(derniereFacture.total_amount));
+  y += 4;
+
+  add("Informations : " + (derniereFacture.message || "Aucune"));
+  add("TVA non applicable, article 293 B du CGI.");
+
+  return pdf.output("blob");
+}
+
+async function telechargerFacture() {
+  if (!derniereFacture) {
+    document.getElementById("status").innerText =
+      "Statut : calcule d’abord le devis.";
+    return;
+  }
+
+  const blob = genererPdfBlob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${derniereFacture.invoice_number}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  document.getElementById("status").innerText =
+    "Statut : facture PDF téléchargée.";
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = String(reader.result || "");
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function envoyerFacture() {
+  if (!derniereFacture) {
+    document.getElementById("status").innerText =
+      "Statut : calcule d’abord le devis avant l’envoi.";
+    return;
+  }
+
+  try {
+    const pdfBlob = genererPdfBlob();
+    const pdfBase64 = await blobToBase64(pdfBlob);
+
+    const response = await fetch(EMAIL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
+        "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+      },
+      body: JSON.stringify({
+        to: derniereFacture.client_email,
+        subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
+        text:
+          "Bonjour " + derniereFacture.client_name + ",\n\n" +
+          "Veuillez trouver votre facture " + derniereFacture.invoice_number +
+          " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
+          "Cordialement,\nProconvoi17",
+        filename: derniereFacture.invoice_number + ".pdf",
+        pdfBase64
+      })
+    });
+
+    const responseText = await response.text();
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status + " - " + responseText);
     }
 
-    function montantPaypal(v) {
-      return Number(v || 0).toFixed(2);
-    }
+    await supabaseClient
+      .from("invoices")
+      .update({ email_sent: true })
+      .eq("id", derniereFacture.id);
 
-    function buildInvoiceNumber() {
-      const d = new Date();
-      const year = d.getFullYear();
-      const stamp = String(Date.now()).slice(-6);
-      return `FAC-${year}-${stamp}`;
-    }
+    derniereFacture.email_sent = true;
+    document.getElementById("emailStatus").innerText = "Envoyé";
+    document.getElementById("status").innerText =
+      "Statut : facture envoyée par email à " + derniereFacture.client_email;
+  } catch (err) {
+    console.error("❌ Erreur email:", err);
+    document.getElementById("status").innerText =
+      "Statut : erreur d’envoi email.\n" + err.message;
+  }
+}
 
-    function lireFormulaire() {
-      return {
-        clientName: document.getElementById("clientName").value.trim(),
-        clientEmail: document.getElementById("clientEmail").value.trim(),
-        clientPhone: document.getElementById("clientPhone").value.trim(),
-        company: document.getElementById("company").value.trim(),
-        vehicleText: document.getElementById("type").selectedOptions[0].text,
-        tarif: parseFloat(document.getElementById("type").value) || 0,
-        km: parseFloat(document.getElementById("km").value) || 0,
-        message: document.getElementById("message").value.trim()
-      };
-    }
-
-    function calculMontants() {
-      const form = lireFormulaire();
-      const base = form.km * form.tarif;
-      const frais = base * 0.26;
-      const total = base + frais;
-      return { ...form, base, frais, total };
-    }
-
-    function majAffichage(result) {
-      document.getElementById("resultat").innerText = "Montant estimatif : " + euro(result.total);
-      if (derniereFacture?.invoice_number) {
-        document.getElementById("invoiceNumber").innerText = derniereFacture.invoice_number;
-      }
-      document.getElementById("emailStatus").innerText = derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
-    }
-
-    async function calculer() {
-      const result = calculMontants();
-
-      if (!result.clientName || !result.clientEmail || !result.km) {
-        document.getElementById("status").innerText =
-          "Statut : merci de renseigner le nom, l’email et la distance.";
-        return;
-      }
-
-      const invoiceNumber = buildInvoiceNumber();
-
-      const payload = {
-        invoice_number: invoiceNumber,
-        created_at_label: new Date().toLocaleDateString("fr-FR"),
-        service_type: "convoyage",
-        vehicle_type: result.vehicleText,
-        distance_km: result.km,
-        client_name: result.clientName,
-        company: result.company,
-        client_email: result.clientEmail,
-        client_phone: result.clientPhone,
-        message: result.message,
-        base_amount: result.base,
-        fees_amount: result.frais,
-        total_amount: result.total,
-        email_sent: false
-      };
-
-      const { data, error } = await supabaseClient
-        .from("invoices")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("❌ Erreur Supabase:", error);
-        document.getElementById("status").innerText =
-          "Statut : erreur de sauvegarde.\n" + error.message;
-        return;
-      }
-
-      derniereFacture = data;
-      majAffichage(result);
-
-      document.getElementById("status").innerText =
-        "Statut : devis sauvegardé.\nFacture : " + data.invoice_number;
-    }
-
-    function genererPdfBlob() {
-      if (!derniereFacture) return null;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-
-      let y = 20;
-      const add = (txt, jump = 8) => {
-        pdf.text(String(txt), 20, y);
-        y += jump;
-      };
-
-      pdf.setFontSize(18);
-      add("FACTURE", 12);
-
-      pdf.setFontSize(11);
-      add("Proconvoi17");
-      add("SIRET : 532 293 461 00044");
-      add("Téléphone : 0763082637");
-      add("Email : mickaelple066@gmail.com");
-      y += 4;
-
-      add("Facture n° : " + (derniereFacture.invoice_number || "-"));
-      add("Date : " + (derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")));
-      y += 4;
-
-      add("Client : " + (derniereFacture.client_name || "-"));
-      add("Email client : " + (derniereFacture.client_email || "-"));
-      add("Téléphone client : " + (derniereFacture.client_phone || "-"));
-      add("Société : " + (derniereFacture.company || "-"));
-      y += 4;
-
-      add("Type de véhicule : " + (derniereFacture.vehicle_type || "-"));
-      add("Distance : " + (derniereFacture.distance_km || 0) + " km");
-      add("Base : " + euro(derniereFacture.base_amount));
-      add("Frais de route (26%) : " + euro(derniereFacture.fees_amount));
-      add("Total : " + euro(derniereFacture.total_amount));
-      y += 4;
-
-      add("Informations : " + (derniereFacture.message || "Aucune"));
-      add("TVA non applicable, article 293 B du CGI.");
-
-      return pdf.output("blob");
-    }
-
-    async function telechargerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis.";
-        return;
-      }
-
-      const blob = genererPdfBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${derniereFacture.invoice_number}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      document.getElementById("status").innerText =
-        "Statut : facture PDF téléchargée.";
-    }
-
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = String(reader.result || "");
-          resolve(result.split(",")[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function envoyerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis avant l’envoi.";
-        return;
-      }
-
-      try {
-        const pdfBlob = genererPdfBlob();
-        const pdfBase64 = await blobToBase64(pdfBlob);
-
-        const response = await fetch(EMAIL_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+function payerPaypal() {
+  const result = calculMontants();
+  if (!result.km) {
+    document.getElementById("status").innerText =
+      "Statut : renseigne la distance avant paiement.";
+    return;
+  }
+  window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
+}
+</script>
           body: JSON.stringify({
             to: derniereFacture.client_email,
             subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
