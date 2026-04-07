@@ -89,6 +89,9 @@
     .invoice-box div {
       margin: 6px 0;
     }
+    .hidden {
+      display: none;
+    }
     @media (max-width: 700px) {
       .container { margin: 20px; }
       .grid { grid-template-columns: 1fr; }
@@ -98,7 +101,7 @@
 <body>
   <div class="container">
     <h1>🚛 Proconvoi17</h1>
-    <p>Devis convoyage, sauvegarde, facture PDF et envoi email.</p>
+    <p>Convoyage, conducteur PL/SPL, facture PDF, email et paiement.</p>
 
     <div class="grid">
       <div>
@@ -119,14 +122,30 @@
       </div>
     </div>
 
-    <label for="type">Type de véhicule</label>
-    <select id="type">
-      <option value="0.98">VL - 0,98 €/km</option>
-      <option value="2.2">PL / SPL - 2,20 €/km</option>
+    <label for="serviceType">Type de prestation</label>
+    <select id="serviceType" onchange="changerMode()">
+      <option value="convoyage">Convoyage</option>
+      <option value="conducteur">Conducteur PL / SPL</option>
     </select>
 
-    <label for="km">Distance en kilomètres</label>
-    <input id="km" type="number" placeholder="Ex: 150" />
+    <div id="blocConvoyage">
+      <label for="type">Type de véhicule</label>
+      <select id="type">
+        <option value="0.98">VL - 0,98 €/km</option>
+        <option value="2.2">PL / SPL - 2,20 €/km</option>
+      </select>
+
+      <label for="km">Distance en kilomètres</label>
+      <input id="km" type="number" placeholder="Ex: 150" />
+    </div>
+
+    <div id="blocConducteur" class="hidden">
+      <label for="jours">Nombre de jours</label>
+      <input id="jours" type="number" placeholder="Ex: 2" min="0" />
+
+      <label for="decouches">Nombre de découchés</label>
+      <input id="decouches" type="number" placeholder="Ex: 1" min="0" />
+    </div>
 
     <label for="message">Informations complémentaires</label>
     <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
@@ -157,7 +176,6 @@
 
     const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
     const PAYPAL_BASE = "https://paypal.me/proconvoi";
-
     const SUPABASE_ANON_JWT =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
 
@@ -178,8 +196,15 @@
       return `FAC-${year}-${stamp}`;
     }
 
+    function changerMode() {
+      const mode = document.getElementById("serviceType").value;
+      document.getElementById("blocConvoyage").classList.toggle("hidden", mode !== "convoyage");
+      document.getElementById("blocConducteur").classList.toggle("hidden", mode !== "conducteur");
+    }
+
     function lireFormulaire() {
       return {
+        serviceType: document.getElementById("serviceType").value,
         clientName: document.getElementById("clientName").value.trim(),
         clientEmail: document.getElementById("clientEmail").value.trim(),
         clientPhone: document.getElementById("clientPhone").value.trim(),
@@ -187,12 +212,22 @@
         vehicleText: document.getElementById("type").selectedOptions[0].text,
         tarif: parseFloat(document.getElementById("type").value) || 0,
         km: parseFloat(document.getElementById("km").value) || 0,
+        jours: parseFloat(document.getElementById("jours").value) || 0,
+        decouches: parseFloat(document.getElementById("decouches").value) || 0,
         message: document.getElementById("message").value.trim()
       };
     }
 
     function calculMontants() {
       const form = lireFormulaire();
+
+      if (form.serviceType === "conducteur") {
+        const base = form.jours * 340;
+        const frais = form.decouches * 90;
+        const total = base + frais;
+        return { ...form, base, frais, total };
+      }
+
       const base = form.km * form.tarif;
       const frais = base * 0.26;
       const total = base + frais;
@@ -213,9 +248,21 @@
     async function calculer() {
       const result = calculMontants();
 
-      if (!result.clientName || !result.clientEmail || !result.km) {
+      if (!result.clientName || !result.clientEmail) {
         document.getElementById("status").innerText =
-          "Statut : merci de renseigner le nom, l’email et la distance.";
+          "Statut : merci de renseigner le nom et l’email.";
+        return;
+      }
+
+      if (result.serviceType === "convoyage" && !result.km) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner la distance.";
+        return;
+      }
+
+      if (result.serviceType === "conducteur" && !result.jours) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner le nombre de jours.";
         return;
       }
 
@@ -224,9 +271,11 @@
       const payload = {
         invoice_number: invoiceNumber,
         created_at_label: new Date().toLocaleDateString("fr-FR"),
-        service_type: "convoyage",
-        vehicle_type: result.vehicleText,
-        distance_km: result.km,
+        service_type: result.serviceType,
+        vehicle_type: result.serviceType === "convoyage" ? result.vehicleText : "Conducteur PL / SPL",
+        distance_km: result.serviceType === "convoyage" ? result.km : null,
+        days: result.serviceType === "conducteur" ? result.jours : null,
+        overnights: result.serviceType === "conducteur" ? result.decouches : null,
         client_name: result.clientName,
         company: result.company,
         client_email: result.clientEmail,
@@ -290,10 +339,19 @@
       add("Société : " + (derniereFacture.company || "-"));
       y += 4;
 
-      add("Type de véhicule : " + (derniereFacture.vehicle_type || "-"));
-      add("Distance : " + (derniereFacture.distance_km || 0) + " km");
-      add("Base : " + euro(derniereFacture.base_amount));
-      add("Frais de route (26%) : " + euro(derniereFacture.fees_amount));
+      add("Prestation : " + (derniereFacture.vehicle_type || "-"));
+
+      if (derniereFacture.service_type === "conducteur") {
+        add("Jours : " + (derniereFacture.days || 0));
+        add("Découchés : " + (derniereFacture.overnights || 0));
+        add("Base mission : " + euro(derniereFacture.base_amount));
+        add("Frais découchés : " + euro(derniereFacture.fees_amount));
+      } else {
+        add("Distance : " + (derniereFacture.distance_km || 0) + " km");
+        add("Base : " + euro(derniereFacture.base_amount));
+        add("Frais de route (26%) : " + euro(derniereFacture.fees_amount));
+      }
+
       add("Total : " + euro(derniereFacture.total_amount));
       y += 4;
 
@@ -389,11 +447,19 @@
 
     function payerPaypal() {
       const result = calculMontants();
-      if (!result.km) {
+
+      if (result.serviceType === "convoyage" && !result.km) {
         document.getElementById("status").innerText =
           "Statut : renseigne la distance avant paiement.";
         return;
       }
+
+      if (result.serviceType === "conducteur" && !result.jours) {
+        document.getElementById("status").innerText =
+          "Statut : renseigne le nombre de jours avant paiement.";
+        return;
+      }
+
       window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
     }
   </script>
