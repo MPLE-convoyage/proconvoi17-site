@@ -344,11 +344,11 @@
 
         const response = await fetch(EMAIL_ENDPOINT, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
-            "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-          },
+          headers: headers: {
+  "Content-Type": "application/json",
+  "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk",
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk"
+},
           body: JSON.stringify({
             to: derniereFacture.client_email,
             subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
