@@ -414,58 +414,135 @@
     }
 
     function genererPdfBlob() {
-      if (!derniereFacture) return null;
+  if (!derniereFacture) return null;
 
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
 
-      let y = 20;
-      const add = (txt, jump = 8) => {
-        pdf.text(String(txt), 20, y);
-        y += jump;
-      };
+  const pageWidth = pdf.internal.pageSize.getWidth();
 
-      pdf.setFontSize(18);
-      add("FACTURE", 12);
+  let y = 20;
 
-      pdf.setFontSize(11);
-      add("Proconvoi17");
-      add("SIRET : 532 293 461 00044");
-      add("Téléphone : 0763082637");
-      add("Email : mickaelple066@gmail.com");
-      y += 4;
+  const line = (text, x = 20, jump = 7) => {
+    pdf.text(String(text), x, y);
+    y += jump;
+  };
 
-      add("Facture n° : " + (derniereFacture.invoice_number || "-"));
-      add("Date : " + (derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")));
-      y += 4;
+  const hr = () => {
+    pdf.setDrawColor(180);
+    pdf.line(20, y, pageWidth - 20, y);
+    y += 8;
+  };
 
-      add("Client : " + (derniereFacture.client_name || "-"));
-      add("Email client : " + (derniereFacture.client_email || "-"));
-      add("Téléphone client : " + (derniereFacture.client_phone || "-"));
-      add("Société : " + (derniereFacture.company || "-"));
-      y += 4;
+  const box = (title, lines, startY) => {
+    const x = title === "CLIENT" ? 110 : 20;
+    const w = 80;
+    const h = 10 + lines.length * 7 + 6;
 
-      add("Prestation : " + (derniereFacture.vehicle_type || "-"));
+    pdf.setDrawColor(200);
+    pdf.rect(x, startY, w, h);
 
-      if (derniereFacture.service_type === "conducteur") {
-        add("Jours : " + (derniereFacture.days || 0));
-        add("Découchés : " + (derniereFacture.overnights || 0));
-        add("Base mission : " + euro(derniereFacture.base_amount));
-        add("Frais découchés : " + euro(derniereFacture.fees_amount));
-      } else {
-        add("Distance : " + (derniereFacture.distance_km || 0) + " km");
-        add("Base : " + euro(derniereFacture.base_amount));
-        add("Frais de route : " + euro(derniereFacture.fees_amount));
-      }
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text(title, x + 4, startY + 7);
 
-      add("Total : " + euro(derniereFacture.total_amount));
-      y += 4;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
 
-      add("Informations : " + (derniereFacture.message || "Aucune"));
-      add("TVA non applicable, article 293 B du CGI.");
+    let ly = startY + 15;
+    lines.forEach((l) => {
+      pdf.text(String(l), x + 4, ly);
+      ly += 7;
+    });
 
-      return pdf.output("blob");
-    }
+    return h;
+  };
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(20);
+  pdf.text("FACTURE", 20, y);
+
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`N° ${derniereFacture.invoice_number || "-"}`, pageWidth - 70, y);
+  y += 10;
+
+  pdf.setFontSize(10);
+  pdf.text(`Date : ${derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
+  y += 10;
+
+  const companyLines = [
+    "Proconvoi17",
+    "Auto-entrepreneur",
+    "SIRET : 532 293 461 00044",
+    "Téléphone : 0763082637",
+    "Email : mickaelple066@gmail.com"
+  ];
+
+  const clientLines = [
+    `Nom : ${derniereFacture.client_name || "-"}`,
+    `Société : ${derniereFacture.company || "-"}`,
+    `Téléphone : ${derniereFacture.client_phone || "-"}`,
+    `Email : ${derniereFacture.client_email || "-"}`
+  ];
+
+  const boxY = y;
+  const h1 = box("PRESTATAIRE", companyLines, boxY);
+  const h2 = box("CLIENT", clientLines, boxY);
+  y += Math.max(h1, h2) + 10;
+
+  hr();
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
+  line("DÉTAIL DE LA PRESTATION", 20, 9);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  if (derniereFacture.service_type === "conducteur") {
+    line(`Type : Conducteur PL / SPL`);
+    line(`Nombre de jours : ${derniereFacture.days || 0}`);
+    line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
+    line(`Base mission : ${euro(derniereFacture.base_amount)}`);
+    line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
+  } else {
+    line(`Type : ${derniereFacture.vehicle_type || "-"}`);
+    line(`Distance : ${derniereFacture.distance_km || 0} km`);
+    line(`Base transport : ${euro(derniereFacture.base_amount)}`);
+    line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
+  }
+
+  if (derniereFacture.message) {
+    y += 2;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Informations complémentaires :", 20, y);
+    y += 7;
+    pdf.setFont("helvetica", "normal");
+
+    const split = pdf.splitTextToSize(derniereFacture.message, 170);
+    pdf.text(split, 20, y);
+    y += split.length * 6 + 4;
+  }
+
+  hr();
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.text("TOTAL À PAYER", 20, y);
+
+  pdf.setFontSize(16);
+  pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
+  y += 12;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.text("TVA non applicable, article 293 B du CGI.", 20, y);
+  y += 6;
+  pdf.text("Merci pour votre confiance.", 20, y);
+
+  return pdf.output("blob");
+}
 
     async function telechargerFacture() {
       if (!derniereFacture) {
