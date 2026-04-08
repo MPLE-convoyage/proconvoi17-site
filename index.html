@@ -1,33 +1,575 @@
-<h1>🚛 Proconvoi17</h1>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proconvoi17</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 0;
+      color: #1f2937;
+    }
+    .hero {
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: white;
+      padding: 50px 20px;
+      text-align: center;
+    }
+    .hero h1 {
+      margin: 0 0 12px 0;
+      font-size: 38px;
+    }
+    .hero p {
+      margin: 8px 0;
+      color: #e5e7eb;
+      font-size: 18px;
+    }
+    .hero .cta {
+      display: inline-block;
+      margin-top: 20px;
+      background: white;
+      color: #111827;
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    .section {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #111827;
+    }
+    .container {
+      max-width: 760px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #111827;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 14px;
+      background: #111827;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1f2937;
+    }
+    .secondary {
+      background: #2563eb;
+    }
+    .secondary:hover {
+      background: #1d4ed8;
+    }
+    .paypal {
+      background: #0070ba;
+    }
+    .paypal:hover {
+      background: #005f99;
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .result, .status, .invoice-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .result {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .status {
+      white-space: pre-line;
+      font-size: 14px;
+    }
+    .invoice-box div {
+      margin: 6px 0;
+    }
+    .hidden {
+      display: none;
+    }
+    .footer {
+      max-width: 1100px;
+      margin: 30px auto 50px auto;
+      padding: 0 20px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      .container { margin: 20px; }
+      .grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
 
-<p style="font-size:18px; font-weight:bold;">
-Convoyage de véhicules VL / PL / SPL & Conducteur PL/SPL indépendant
-</p>
+  <div class="hero">
+    <h1>🚛 Proconvoi17</h1>
+    <p>Convoyage de véhicules VL / PL / SPL</p>
+    <p>Conducteur PL / SPL indépendant</p>
+    <p>Devis rapide, facture PDF, paiement PayPal et envoi par email</p>
+    <a href="#devis" class="cta">Demander un devis</a>
+  </div>
 
-<p>
-Intervention rapide partout en France.<br>
-Devis immédiat, facturation claire et paiement simplifié.
-</p>
+  <div class="section">
+    <h2>Présentation</h2>
+    <p>
+      Proconvoi17 vous accompagne pour le convoyage de véhicules légers, poids lourds et super poids lourds,
+      ainsi que pour les missions de conducteur PL / SPL indépendant. Le site permet de calculer rapidement
+      un devis, d’éditer une facture, de l’envoyer par email et de proposer un paiement simplifié.
+    </p>
 
-<hr>
+    <div class="cards">
+      <div class="card">
+        <h3>Convoyage VL</h3>
+        <p>Tarif : <strong>0,98 € / km</strong></p>
+        <p>+ <strong>26%</strong> de frais de route</p>
+      </div>
+      <div class="card">
+        <h3>Convoyage PL / SPL</h3>
+        <p>Tarif : <strong>2,20 € / km</strong></p>
+        <p>+ <strong>26%</strong> de frais de route</p>
+      </div>
+      <div class="card">
+        <h3>Conducteur PL / SPL</h3>
+        <p>Tarif journalier : <strong>340 € / jour</strong></p>
+        <p>Découché : <strong>90 €</strong></p>
+      </div>
+      <div class="card">
+        <h3>Pourquoi choisir Proconvoi17</h3>
+        <p>Réactivité, sérieux, devis rapide, facturation claire et paiement simple.</p>
+      </div>
+    </div>
+  </div>
 
-<h2>Nos prestations</h2>
+  <div class="container" id="devis">
+    <h2>Demande de devis</h2>
 
-<ul>
-  <li>Convoyage VL : <strong>0,98 €/km</strong></li>
-  <li>Convoyage PL / SPL : <strong>2,20 €/km</strong></li>
-  <li>Frais de route : <strong>+26%</strong></li>
-  <li>Conducteur PL / SPL : <strong>340 €/jour</strong></li>
-  <li>Découché : <strong>90 €</strong></li>
-</ul>
+    <div class="grid">
+      <div>
+        <label for="clientName">Nom du client</label>
+        <input id="clientName" type="text" placeholder="Ex: Jean Dupont" />
+      </div>
+      <div>
+        <label for="clientEmail">Email du client</label>
+        <input id="clientEmail" type="email" placeholder="client@email.com" />
+      </div>
+      <div>
+        <label for="clientPhone">Téléphone</label>
+        <input id="clientPhone" type="text" placeholder="Ex: 0612345678" />
+      </div>
+      <div>
+        <label for="company">Société</label>
+        <input id="company" type="text" placeholder="Ex: Transports Martin" />
+      </div>
+    </div>
 
-<h2>Pourquoi nous choisir ?</h2>
+    <label for="serviceType">Type de prestation</label>
+    <select id="serviceType" onchange="changerMode()">
+      <option value="convoyage">Convoyage</option>
+      <option value="conducteur">Conducteur PL / SPL</option>
+    </select>
 
-<ul>
-  <li>✔️ Réactivité</li>
-  <li>✔️ Professionnalisme</li>
-  <li>✔️ Devis instantané</li>
-  <li>✔️ Paiement simple</li>
-</ul>
+    <div id="blocConvoyage">
+      <label for="type">Type de véhicule</label>
+      <select id="type">
+        <option value="0.98">VL - 0,98 €/km</option>
+        <option value="2.2">PL / SPL - 2,20 €/km</option>
+      </select>
 
-<hr>
+      <label for="km">Distance en kilomètres</label>
+      <input id="km" type="number" placeholder="Ex: 150" />
+    </div>
+
+    <div id="blocConducteur" class="hidden">
+      <label for="jours">Nombre de jours</label>
+      <input id="jours" type="number" placeholder="Ex: 2" min="0" />
+
+      <label for="decouches">Nombre de découchés</label>
+      <input id="decouches" type="number" placeholder="Ex: 1" min="0" />
+    </div>
+
+    <label for="prixManuel">Prix négocié / prix manuel (€)</label>
+    <input id="prixManuel" type="number" placeholder="Laisser vide pour calcul automatique" />
+
+    <label for="message">Informations complémentaires</label>
+    <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
+
+    <button onclick="calculer()">Calculer et sauvegarder</button>
+    <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
+    <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
+    <button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
+
+    <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
+
+    <div class="invoice-box">
+      <div><strong>Numéro de facture :</strong> <span id="invoiceNumber">-</span></div>
+      <div><strong>Statut email :</strong> <span id="emailStatus">Non envoyé</span></div>
+    </div>
+
+    <div class="status" id="status">Statut : en attente</div>
+  </div>
+
+  <div class="footer">
+    <p><strong>Proconvoi17</strong> – Auto-entrepreneur</p>
+    <p>SIRET : 532 293 461 00044</p>
+    <p>Email : mickaelple066@gmail.com</p>
+    <p>Téléphone : 0763082637</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://znodbkoakkaucxikkway.supabase.co",
+      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+    );
+
+    const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
+    const PAYPAL_BASE = "https://paypal.me/proconvoi";
+    const SUPABASE_ANON_JWT =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
+
+    let derniereFacture = null;
+
+    function euro(v) {
+      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+    }
+
+    function montantPaypal(v) {
+      return Number(v || 0).toFixed(2);
+    }
+
+    function buildInvoiceNumber() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const stamp = String(Date.now()).slice(-6);
+      return `FAC-${year}-${stamp}`;
+    }
+
+    function changerMode() {
+      const mode = document.getElementById("serviceType").value;
+      document.getElementById("blocConvoyage").classList.toggle("hidden", mode !== "convoyage");
+      document.getElementById("blocConducteur").classList.toggle("hidden", mode !== "conducteur");
+    }
+
+    function lireFormulaire() {
+      return {
+        serviceType: document.getElementById("serviceType").value,
+        clientName: document.getElementById("clientName").value.trim(),
+        clientEmail: document.getElementById("clientEmail").value.trim(),
+        clientPhone: document.getElementById("clientPhone").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        vehicleText: document.getElementById("type").selectedOptions[0].text,
+        tarif: parseFloat(document.getElementById("type").value) || 0,
+        km: parseFloat(document.getElementById("km").value) || 0,
+        jours: parseFloat(document.getElementById("jours").value) || 0,
+        decouches: parseFloat(document.getElementById("decouches").value) || 0,
+        prixManuel: parseFloat(document.getElementById("prixManuel").value) || 0,
+        message: document.getElementById("message").value.trim()
+      };
+    }
+
+    function calculMontants() {
+      const form = lireFormulaire();
+
+      if (form.prixManuel > 0) {
+        return { ...form, base: form.prixManuel, frais: 0, total: form.prixManuel, manuel: true };
+      }
+
+      if (form.serviceType === "conducteur") {
+        const base = form.jours * 340;
+        const frais = form.decouches * 90;
+        const total = base + frais;
+        return { ...form, base, frais, total, manuel: false };
+      }
+
+      const base = form.km * form.tarif;
+      const frais = base * 0.26;
+      const total = base + frais;
+      return { ...form, base, frais, total, manuel: false };
+    }
+
+    function majAffichage(result) {
+      document.getElementById("resultat").innerText =
+        "Montant estimatif : " + euro(result.total);
+
+      document.getElementById("invoiceNumber").innerText =
+        derniereFacture?.invoice_number || "-";
+
+      document.getElementById("emailStatus").innerText =
+        derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
+    }
+
+    async function calculer() {
+      const result = calculMontants();
+
+      if (!result.clientName || !result.clientEmail) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner le nom et l’email.";
+        return;
+      }
+
+      if (!result.prixManuel) {
+        if (result.serviceType === "convoyage" && !result.km) {
+          document.getElementById("status").innerText =
+            "Statut : merci de renseigner la distance.";
+          return;
+        }
+
+        if (result.serviceType === "conducteur" && !result.jours) {
+          document.getElementById("status").innerText =
+            "Statut : merci de renseigner le nombre de jours.";
+          return;
+        }
+      }
+
+      const invoiceNumber = buildInvoiceNumber();
+
+      const payload = {
+        invoice_number: invoiceNumber,
+        created_at_label: new Date().toLocaleDateString("fr-FR"),
+        service_type: result.serviceType,
+        vehicle_type: result.serviceType === "convoyage" ? result.vehicleText : "Conducteur PL / SPL",
+        distance_km: result.serviceType === "convoyage" ? result.km : null,
+        days: result.serviceType === "conducteur" ? result.jours : null,
+        overnights: result.serviceType === "conducteur" ? result.decouches : null,
+        client_name: result.clientName,
+        company: result.company,
+        client_email: result.clientEmail,
+        client_phone: result.clientPhone,
+        message: result.message,
+        base_amount: result.base,
+        fees_amount: result.frais,
+        total_amount: result.total,
+        email_sent: false
+      };
+
+      const { data, error } = await supabaseClient
+        .from("invoices")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("❌ Erreur Supabase:", error);
+        document.getElementById("status").innerText =
+          "Statut : erreur de sauvegarde.\n" + error.message;
+        return;
+      }
+
+      derniereFacture = data;
+      majAffichage(result);
+
+      document.getElementById("status").innerText =
+        "Statut : devis sauvegardé.\nFacture : " + data.invoice_number;
+    }
+
+    function genererPdfBlob() {
+      if (!derniereFacture) return null;
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      let y = 20;
+      const add = (txt, jump = 8) => {
+        pdf.text(String(txt), 20, y);
+        y += jump;
+      };
+
+      pdf.setFontSize(18);
+      add("FACTURE", 12);
+
+      pdf.setFontSize(11);
+      add("Proconvoi17");
+      add("SIRET : 532 293 461 00044");
+      add("Téléphone : 0763082637");
+      add("Email : mickaelple066@gmail.com");
+      y += 4;
+
+      add("Facture n° : " + (derniereFacture.invoice_number || "-"));
+      add("Date : " + (derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")));
+      y += 4;
+
+      add("Client : " + (derniereFacture.client_name || "-"));
+      add("Email client : " + (derniereFacture.client_email || "-"));
+      add("Téléphone client : " + (derniereFacture.client_phone || "-"));
+      add("Société : " + (derniereFacture.company || "-"));
+      y += 4;
+
+      add("Prestation : " + (derniereFacture.vehicle_type || "-"));
+
+      if (derniereFacture.service_type === "conducteur") {
+        add("Jours : " + (derniereFacture.days || 0));
+        add("Découchés : " + (derniereFacture.overnights || 0));
+        add("Base mission : " + euro(derniereFacture.base_amount));
+        add("Frais découchés : " + euro(derniereFacture.fees_amount));
+      } else {
+        add("Distance : " + (derniereFacture.distance_km || 0) + " km");
+        add("Base : " + euro(derniereFacture.base_amount));
+        add("Frais de route : " + euro(derniereFacture.fees_amount));
+      }
+
+      add("Total : " + euro(derniereFacture.total_amount));
+      y += 4;
+
+      add("Informations : " + (derniereFacture.message || "Aucune"));
+      add("TVA non applicable, article 293 B du CGI.");
+
+      return pdf.output("blob");
+    }
+
+    async function telechargerFacture() {
+      if (!derniereFacture) {
+        document.getElementById("status").innerText =
+          "Statut : calcule d’abord le devis.";
+        return;
+      }
+
+      const blob = genererPdfBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${derniereFacture.invoice_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      document.getElementById("status").innerText =
+        "Statut : facture PDF téléchargée.";
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = String(reader.result || "");
+          resolve(result.split(",")[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function envoyerFacture() {
+      if (!derniereFacture) {
+        document.getElementById("status").innerText =
+          "Statut : calcule d’abord le devis avant l’envoi.";
+        return;
+      }
+
+      try {
+        const pdfBlob = genererPdfBlob();
+        const pdfBase64 = await blobToBase64(pdfBlob);
+
+        const response = await fetch(EMAIL_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_JWT,
+            "Authorization": "Bearer " + SUPABASE_ANON_JWT
+          },
+          body: JSON.stringify({
+            to: derniereFacture.client_email,
+            subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
+            text:
+              "Bonjour " + derniereFacture.client_name + ",\n\n" +
+              "Veuillez trouver votre facture " + derniereFacture.invoice_number +
+              " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
+              "Cordialement,\nProconvoi17",
+            filename: derniereFacture.invoice_number + ".pdf",
+            pdfBase64
+          })
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status + " - " + responseText);
+        }
+
+        await supabaseClient
+          .from("invoices")
+          .update({ email_sent: true })
+          .eq("id", derniereFacture.id);
+
+        derniereFacture.email_sent = true;
+        document.getElementById("emailStatus").innerText = "Envoyé";
+        document.getElementById("status").innerText =
+          "Statut : facture envoyée par email à " + derniereFacture.client_email;
+      } catch (err) {
+        console.error("❌ Erreur email:", err);
+        document.getElementById("status").innerText =
+          "Statut : erreur d’envoi email.\n" + err.message;
+      }
+    }
+
+    function payerPaypal() {
+      const result = calculMontants();
+
+      if (!result.prixManuel) {
+        if (result.serviceType === "convoyage" && !result.km) {
+          document.getElementById("status").innerText =
+            "Statut : renseigne la distance avant paiement.";
+          return;
+        }
+
+        if (result.serviceType === "conducteur" && !result.jours) {
+          document.getElementById("status").innerText =
+            "Statut : renseigne le nombre de jours avant paiement.";
+          return;
+        }
+      }
+
+      window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
+    }
+  </script>
+</body>
+</html>
