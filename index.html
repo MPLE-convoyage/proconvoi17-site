@@ -162,8 +162,7 @@
     <h2>Présentation</h2>
     <p>
       Proconvoi17 vous accompagne pour le convoyage de véhicules légers, poids lourds et super poids lourds,
-      ainsi que pour les missions de conducteur PL / SPL indépendant. Le site permet de calculer rapidement
-      un devis, d’éditer une facture, de l’envoyer par email et de proposer un paiement simplifié.
+      ainsi que pour les missions de conducteur PL / SPL indépendant.
     </p>
 
     <div class="cards">
@@ -183,8 +182,8 @@
         <p>Découché : <strong>90 €</strong></p>
       </div>
       <div class="card">
-        <h3>Pourquoi choisir Proconvoi17</h3>
-        <p>Réactivité, sérieux, devis rapide, facturation claire et paiement simple.</p>
+        <h3>Pourquoi nous choisir</h3>
+        <p>Réactivité, professionnalisme, devis rapide, paiement simple.</p>
       </div>
     </div>
   </div>
@@ -235,9 +234,6 @@
       <label for="decouches">Nombre de découchés</label>
       <input id="decouches" type="number" placeholder="Ex: 1" min="0" />
     </div>
-
-    <label for="prixManuel">Prix négocié / prix manuel (€)</label>
-    <input id="prixManuel" type="number" placeholder="Laisser vide pour calcul automatique" />
 
     <label for="message">Informations complémentaires</label>
     <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
@@ -313,7 +309,6 @@
         km: parseFloat(document.getElementById("km").value) || 0,
         jours: parseFloat(document.getElementById("jours").value) || 0,
         decouches: parseFloat(document.getElementById("decouches").value) || 0,
-        prixManuel: parseFloat(document.getElementById("prixManuel").value) || 0,
         message: document.getElementById("message").value.trim()
       };
     }
@@ -321,21 +316,17 @@
     function calculMontants() {
       const form = lireFormulaire();
 
-      if (form.prixManuel > 0) {
-        return { ...form, base: form.prixManuel, frais: 0, total: form.prixManuel, manuel: true };
-      }
-
       if (form.serviceType === "conducteur") {
         const base = form.jours * 340;
         const frais = form.decouches * 90;
         const total = base + frais;
-        return { ...form, base, frais, total, manuel: false };
+        return { ...form, base, frais, total };
       }
 
       const base = form.km * form.tarif;
       const frais = base * 0.26;
       const total = base + frais;
-      return { ...form, base, frais, total, manuel: false };
+      return { ...form, base, frais, total };
     }
 
     function majAffichage(result) {
@@ -358,18 +349,16 @@
         return;
       }
 
-      if (!result.prixManuel) {
-        if (result.serviceType === "convoyage" && !result.km) {
-          document.getElementById("status").innerText =
-            "Statut : merci de renseigner la distance.";
-          return;
-        }
+      if (result.serviceType === "convoyage" && !result.km) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner la distance.";
+        return;
+      }
 
-        if (result.serviceType === "conducteur" && !result.jours) {
-          document.getElementById("status").innerText =
-            "Statut : merci de renseigner le nombre de jours.";
-          return;
-        }
+      if (result.serviceType === "conducteur" && !result.jours) {
+        document.getElementById("status").innerText =
+          "Statut : merci de renseigner le nombre de jours.";
+        return;
       }
 
       const invoiceNumber = buildInvoiceNumber();
@@ -414,135 +403,133 @@
     }
 
     function genererPdfBlob() {
-  if (!derniereFacture) return null;
+      if (!derniereFacture) return null;
 
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
+      let y = 20;
 
-  let y = 20;
+      const line = (text, x = 20, jump = 7) => {
+        pdf.text(String(text), x, y);
+        y += jump;
+      };
 
-  const line = (text, x = 20, jump = 7) => {
-    pdf.text(String(text), x, y);
-    y += jump;
-  };
+      const hr = () => {
+        pdf.setDrawColor(180);
+        pdf.line(20, y, pageWidth - 20, y);
+        y += 8;
+      };
 
-  const hr = () => {
-    pdf.setDrawColor(180);
-    pdf.line(20, y, pageWidth - 20, y);
-    y += 8;
-  };
+      const box = (title, lines, startY) => {
+        const x = title === "CLIENT" ? 110 : 20;
+        const w = 80;
+        const h = 10 + lines.length * 7 + 6;
 
-  const box = (title, lines, startY) => {
-    const x = title === "CLIENT" ? 110 : 20;
-    const w = 80;
-    const h = 10 + lines.length * 7 + 6;
+        pdf.setDrawColor(200);
+        pdf.rect(x, startY, w, h);
 
-    pdf.setDrawColor(200);
-    pdf.rect(x, startY, w, h);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        pdf.text(title, x + 4, startY + 7);
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(11);
-    pdf.text(title, x + 4, startY + 7);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
 
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10);
+        let ly = startY + 15;
+        lines.forEach((l) => {
+          pdf.text(String(l), x + 4, ly);
+          ly += 7;
+        });
 
-    let ly = startY + 15;
-    lines.forEach((l) => {
-      pdf.text(String(l), x + 4, ly);
-      ly += 7;
-    });
+        return h;
+      };
 
-    return h;
-  };
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(20);
+      pdf.text("FACTURE", 20, y);
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(20);
-  pdf.text("FACTURE", 20, y);
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`N° ${derniereFacture.invoice_number || "-"}`, pageWidth - 70, y);
+      y += 10;
 
-  pdf.setFontSize(11);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`N° ${derniereFacture.invoice_number || "-"}`, pageWidth - 70, y);
-  y += 10;
+      pdf.setFontSize(10);
+      pdf.text(`Date : ${derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
+      y += 10;
 
-  pdf.setFontSize(10);
-  pdf.text(`Date : ${derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
-  y += 10;
+      const companyLines = [
+        "Proconvoi17",
+        "Auto-entrepreneur",
+        "SIRET : 532 293 461 00044",
+        "Téléphone : 0763082637",
+        "Email : mickaelple066@gmail.com"
+      ];
 
-  const companyLines = [
-    "Proconvoi17",
-    "Auto-entrepreneur",
-    "SIRET : 532 293 461 00044",
-    "Téléphone : 0763082637",
-    "Email : mickaelple066@gmail.com"
-  ];
+      const clientLines = [
+        `Nom : ${derniereFacture.client_name || "-"}`,
+        `Société : ${derniereFacture.company || "-"}`,
+        `Téléphone : ${derniereFacture.client_phone || "-"}`,
+        `Email : ${derniereFacture.client_email || "-"}`
+      ];
 
-  const clientLines = [
-    `Nom : ${derniereFacture.client_name || "-"}`,
-    `Société : ${derniereFacture.company || "-"}`,
-    `Téléphone : ${derniereFacture.client_phone || "-"}`,
-    `Email : ${derniereFacture.client_email || "-"}`
-  ];
+      const boxY = y;
+      const h1 = box("PRESTATAIRE", companyLines, boxY);
+      const h2 = box("CLIENT", clientLines, boxY);
+      y += Math.max(h1, h2) + 10;
 
-  const boxY = y;
-  const h1 = box("PRESTATAIRE", companyLines, boxY);
-  const h2 = box("CLIENT", clientLines, boxY);
-  y += Math.max(h1, h2) + 10;
+      hr();
 
-  hr();
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      line("DÉTAIL DE LA PRESTATION", 20, 9);
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(12);
-  line("DÉTAIL DE LA PRESTATION", 20, 9);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
+      if (derniereFacture.service_type === "conducteur") {
+        line("Type : Conducteur PL / SPL");
+        line(`Nombre de jours : ${derniereFacture.days || 0}`);
+        line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
+        line(`Base mission : ${euro(derniereFacture.base_amount)}`);
+        line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
+      } else {
+        line(`Type : ${derniereFacture.vehicle_type || "-"}`);
+        line(`Distance : ${derniereFacture.distance_km || 0} km`);
+        line(`Base transport : ${euro(derniereFacture.base_amount)}`);
+        line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
+      }
 
-  if (derniereFacture.service_type === "conducteur") {
-    line(`Type : Conducteur PL / SPL`);
-    line(`Nombre de jours : ${derniereFacture.days || 0}`);
-    line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
-    line(`Base mission : ${euro(derniereFacture.base_amount)}`);
-    line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
-  } else {
-    line(`Type : ${derniereFacture.vehicle_type || "-"}`);
-    line(`Distance : ${derniereFacture.distance_km || 0} km`);
-    line(`Base transport : ${euro(derniereFacture.base_amount)}`);
-    line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
-  }
+      if (derniereFacture.message) {
+        y += 2;
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Informations complémentaires :", 20, y);
+        y += 7;
+        pdf.setFont("helvetica", "normal");
+        const split = pdf.splitTextToSize(derniereFacture.message, 170);
+        pdf.text(split, 20, y);
+        y += split.length * 6 + 4;
+      }
 
-  if (derniereFacture.message) {
-    y += 2;
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Informations complémentaires :", 20, y);
-    y += 7;
-    pdf.setFont("helvetica", "normal");
+      hr();
 
-    const split = pdf.splitTextToSize(derniereFacture.message, 170);
-    pdf.text(split, 20, y);
-    y += split.length * 6 + 4;
-  }
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.text("TOTAL À PAYER", 20, y);
 
-  hr();
+      pdf.setFontSize(16);
+      pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
+      y += 12;
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(14);
-  pdf.text("TOTAL À PAYER", 20, y);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.text("TVA non applicable, article 293 B du CGI.", 20, y);
+      y += 6;
+      pdf.text("Merci pour votre confiance.", 20, y);
 
-  pdf.setFontSize(16);
-  pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
-  y += 12;
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(9);
-  pdf.text("TVA non applicable, article 293 B du CGI.", 20, y);
-  y += 6;
-  pdf.text("Merci pour votre confiance.", 20, y);
-
-  return pdf.output("blob");
-}
+      return pdf.output("blob");
+    }
 
     async function telechargerFacture() {
       if (!derniereFacture) {
@@ -631,18 +618,16 @@
     function payerPaypal() {
       const result = calculMontants();
 
-      if (!result.prixManuel) {
-        if (result.serviceType === "convoyage" && !result.km) {
-          document.getElementById("status").innerText =
-            "Statut : renseigne la distance avant paiement.";
-          return;
-        }
+      if (result.serviceType === "convoyage" && !result.km) {
+        document.getElementById("status").innerText =
+          "Statut : renseigne la distance avant paiement.";
+        return;
+      }
 
-        if (result.serviceType === "conducteur" && !result.jours) {
-          document.getElementById("status").innerText =
-            "Statut : renseigne le nombre de jours avant paiement.";
-          return;
-        }
+      if (result.serviceType === "conducteur" && !result.jours) {
+        document.getElementById("status").innerText =
+          "Statut : renseigne le nombre de jours avant paiement.";
+        return;
       }
 
       window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
