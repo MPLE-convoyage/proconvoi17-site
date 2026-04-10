@@ -789,7 +789,12 @@ async function chargerIndisponibilites() {
       window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
     }
 
-    renderPlanning();
+    async function initPlanning() {
+  await chargerIndisponibilites();
+  renderPlanning();
+}
+
+initPlanning();
   </script>
 </body>
 </html>
