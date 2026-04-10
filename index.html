@@ -393,7 +393,7 @@ async function chargerIndisponibilites() {
       const planning = document.getElementById("planning");
       planning.innerHTML = "";
 
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 45; i++) {
         const d = new Date();
         d.setDate(d.getDate() + i);
         const iso = d.toISOString().split("T")[0];
@@ -430,7 +430,7 @@ async function chargerIndisponibilites() {
       const form = lireFormulaire();
 
       if (form.serviceType === "conducteur") {
-        const base = form.jours * 340;
+        const base = form.jours * 320;
         const frais = form.decouches * 90;
         const total = base + frais;
         return { ...form, base, frais, total };
