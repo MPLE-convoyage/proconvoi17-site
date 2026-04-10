@@ -69,6 +69,9 @@
     h2 {
       color: #111827;
     }
+    h3 {
+      color: #111827;
+    }
     label {
       display: block;
       margin-top: 16px;
@@ -113,7 +116,7 @@
       gap: 14px;
       grid-template-columns: 1fr 1fr;
     }
-    .result, .status, .invoice-box {
+    .result, .status, .invoice-box, .calendar-box, .cgv-box {
       margin-top: 20px;
       padding: 16px;
       background: #f9fafb;
@@ -141,6 +144,37 @@
       color: #4b5563;
       font-size: 14px;
     }
+    .planning-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .planning-day {
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .available {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+    .unavailable {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+    .small-note {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 10px;
+    }
+    ul.clean {
+      padding-left: 18px;
+      line-height: 1.6;
+    }
     @media (max-width: 700px) {
       .container { margin: 20px; }
       .grid { grid-template-columns: 1fr; }
@@ -154,7 +188,7 @@
     <h1>🚛 Proconvoi17</h1>
     <p>Convoyage de véhicules VL / PL / SPL</p>
     <p>Conducteur PL / SPL indépendant</p>
-    <p>Devis rapide, facture PDF, paiement PayPal et envoi par email</p>
+    <p>Devis rapide, planning, PDF, paiement PayPal et envoi par email</p>
     <a href="#devis" class="cta">Demander un devis</a>
   </div>
 
@@ -163,6 +197,8 @@
     <p>
       Proconvoi17 vous accompagne pour le convoyage de véhicules légers, poids lourds et super poids lourds,
       ainsi que pour les missions de conducteur PL / SPL indépendant.
+      Le site permet de calculer rapidement un devis, d’éditer un devis PDF, une facture PDF,
+      d’envoyer la facture par email et de proposer un paiement PayPal.
     </p>
 
     <div class="cards">
@@ -178,12 +214,23 @@
       </div>
       <div class="card">
         <h3>Conducteur PL / SPL</h3>
-        <p>Tarif journalier : <strong>320 € / jour</strong></p>
+        <p>Tarif journalier : <strong>340 € / jour</strong></p>
         <p>Découché : <strong>90 €</strong></p>
       </div>
       <div class="card">
         <h3>Pourquoi nous choisir</h3>
-        <p>Réactivité, professionnalisme, devis rapide, paiement simple.</p>
+        <p>Réactivité, professionnalisme, devis rapide, paiement simple et suivi administratif.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="calendar-box">
+      <h2>Planning de disponibilité</h2>
+      <p>Consultez rapidement les prochains jours disponibles et indisponibles.</p>
+      <div id="planning" class="planning-list"></div>
+      <div class="small-note">
+        Les jours en vert sont disponibles. Les jours en rouge sont indisponibles.
       </div>
     </div>
   </div>
@@ -235,10 +282,14 @@
       <input id="decouches" type="number" placeholder="Ex: 1" min="0" />
     </div>
 
+    <label for="dateSouhaitee">Date souhaitée</label>
+    <input id="dateSouhaitee" type="date" />
+
     <label for="message">Informations complémentaires</label>
     <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
 
     <button onclick="calculer()">Calculer et sauvegarder</button>
+    <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
     <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
     <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
     <button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
@@ -246,11 +297,28 @@
     <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
 
     <div class="invoice-box">
-      <div><strong>Numéro de facture :</strong> <span id="invoiceNumber">-</span></div>
+      <div><strong>Numéro :</strong> <span id="invoiceNumber">-</span></div>
       <div><strong>Statut email :</strong> <span id="emailStatus">Non envoyé</span></div>
     </div>
 
     <div class="status" id="status">Statut : en attente</div>
+  </div>
+
+  <div class="section">
+    <div class="cgv-box">
+      <h2>Conditions Générales de Vente</h2>
+      <ul class="clean">
+        <li>Les prestations proposées concernent le convoyage VL, PL, SPL ainsi que les missions de conducteur PL / SPL indépendant.</li>
+        <li>Les tarifs affichés sont donnés à titre indicatif selon les éléments fournis par le client.</li>
+        <li>Pour le convoyage, les frais de route s’ajoutent au tarif kilométrique à hauteur de 26%.</li>
+        <li>Pour les missions conducteur PL / SPL, le tarif est de 340 € par jour et 90 € par découché.</li>
+        <li>Le paiement peut être demandé avant ou à l’issue de la prestation selon accord préalable.</li>
+        <li>Le client doit fournir des informations exactes pour l’établissement du devis et de la facture.</li>
+        <li>En cas d’annulation tardive, des frais peuvent être appliqués selon l’avancement de l’organisation.</li>
+        <li>Le prestataire ne pourra être tenu responsable d’un retard ou empêchement lié à un cas de force majeure, panne, accident ou événement extérieur.</li>
+        <li>TVA non applicable, article 293 B du CGI.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="footer">
@@ -273,6 +341,14 @@
     const PAYPAL_BASE = "https://paypal.me/proconvoi";
     const SUPABASE_ANON_JWT =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
+
+    const indisponibilites = [
+      "2026-04-15",
+      "2026-04-16",
+      "2026-04-20",
+      "2026-04-25",
+      "2026-05-01"
+    ];
 
     let derniereFacture = null;
 
@@ -297,6 +373,36 @@
       document.getElementById("blocConducteur").classList.toggle("hidden", mode !== "conducteur");
     }
 
+    function formatDateFr(dateString) {
+      const d = new Date(dateString);
+      return d.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+
+    function renderPlanning() {
+      const planning = document.getElementById("planning");
+      planning.innerHTML = "";
+
+      for (let i = 0; i < 14; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const iso = d.toISOString().split("T")[0];
+        const isUnavailable = indisponibilites.includes(iso);
+
+        const item = document.createElement("div");
+        item.className = "planning-day " + (isUnavailable ? "unavailable" : "available");
+        item.innerHTML = `
+          <div>${formatDateFr(iso)}</div>
+          <div>${isUnavailable ? "Indisponible" : "Disponible"}</div>
+        `;
+        planning.appendChild(item);
+      }
+    }
+
     function lireFormulaire() {
       return {
         serviceType: document.getElementById("serviceType").value,
@@ -309,6 +415,7 @@
         km: parseFloat(document.getElementById("km").value) || 0,
         jours: parseFloat(document.getElementById("jours").value) || 0,
         decouches: parseFloat(document.getElementById("decouches").value) || 0,
+        dateSouhaitee: document.getElementById("dateSouhaitee").value,
         message: document.getElementById("message").value.trim()
       };
     }
@@ -361,6 +468,12 @@
         return;
       }
 
+      if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
+        document.getElementById("status").innerText =
+          "Statut : la date choisie est actuellement indisponible.";
+        return;
+      }
+
       const invoiceNumber = buildInvoiceNumber();
 
       const payload = {
@@ -399,17 +512,37 @@
       majAffichage(result);
 
       document.getElementById("status").innerText =
-        "Statut : devis sauvegardé.\nFacture : " + data.invoice_number;
+        "Statut : devis sauvegardé.\nNuméro : " + data.invoice_number;
     }
 
-    function genererPdfBlob() {
+    function headerPdf(pdf, titre, numero) {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      let y = 20;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(20);
+      pdf.text(titre, 20, y);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.text(`N° ${numero || "-"}`, pageWidth - 70, y);
+      y += 10;
+
+      pdf.setFontSize(10);
+      pdf.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
+      y += 10;
+
+      return y;
+    }
+
+    function buildDocumentBlob(typeDocument) {
       if (!derniereFacture) return null;
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
       const pageWidth = pdf.internal.pageSize.getWidth();
 
-      let y = 20;
+      let y = headerPdf(pdf, typeDocument, derniereFacture.invoice_number);
 
       const line = (text, x = 20, jump = 7) => {
         pdf.text(String(text), x, y);
@@ -446,19 +579,6 @@
         return h;
       };
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(20);
-      pdf.text("FACTURE", 20, y);
-
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`N° ${derniereFacture.invoice_number || "-"}`, pageWidth - 70, y);
-      y += 10;
-
-      pdf.setFontSize(10);
-      pdf.text(`Date : ${derniereFacture.created_at_label || new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
-      y += 10;
-
       const companyLines = [
         "Proconvoi17",
         "Auto-entrepreneur",
@@ -483,7 +603,7 @@
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(12);
-      line("DÉTAIL DE LA PRESTATION", 20, 9);
+      line(`DÉTAIL DU ${typeDocument}`, 20, 9);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
@@ -501,6 +621,11 @@
         line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
       }
 
+      const dateChoisie = document.getElementById("dateSouhaitee").value;
+      if (dateChoisie) {
+        line(`Date souhaitée : ${formatDateFr(dateChoisie)}`);
+      }
+
       if (derniereFacture.message) {
         y += 2;
         pdf.setFont("helvetica", "bold");
@@ -516,7 +641,7 @@
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(14);
-      pdf.text("TOTAL À PAYER", 20, y);
+      pdf.text(typeDocument === "DEVIS" ? "TOTAL ESTIMATIF" : "TOTAL À PAYER", 20, y);
 
       pdf.setFontSize(16);
       pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
@@ -531,6 +656,25 @@
       return pdf.output("blob");
     }
 
+    async function telechargerDevis() {
+      if (!derniereFacture) {
+        document.getElementById("status").innerText =
+          "Statut : calcule d’abord le devis.";
+        return;
+      }
+
+      const blob = buildDocumentBlob("DEVIS");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `devis-${derniereFacture.invoice_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      document.getElementById("status").innerText =
+        "Statut : devis PDF téléchargé.";
+    }
+
     async function telechargerFacture() {
       if (!derniereFacture) {
         document.getElementById("status").innerText =
@@ -538,11 +682,11 @@
         return;
       }
 
-      const blob = genererPdfBlob();
+      const blob = buildDocumentBlob("FACTURE");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${derniereFacture.invoice_number}.pdf`;
+      a.download = `facture-${derniereFacture.invoice_number}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -570,7 +714,7 @@
       }
 
       try {
-        const pdfBlob = genererPdfBlob();
+        const pdfBlob = buildDocumentBlob("FACTURE");
         const pdfBase64 = await blobToBase64(pdfBlob);
 
         const response = await fetch(EMAIL_ENDPOINT, {
@@ -630,8 +774,16 @@
         return;
       }
 
+      if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
+        document.getElementById("status").innerText =
+          "Statut : date indisponible, paiement impossible.";
+        return;
+      }
+
       window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
     }
+
+    renderPlanning();
   </script>
 </body>
 </html>
