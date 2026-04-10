@@ -376,7 +376,19 @@
         year: "numeric"
       });
     }
+async function chargerIndisponibilites() {
+  const { data, error } = await supabaseClient
+    .from("unavailable_dates")
+    .select("date")
+    .order("date", { ascending: true });
 
+  if (error) {
+    console.error("Erreur chargement planning :", error);
+    return;
+  }
+
+  indisponibilites = data.map(item => item.date);
+}
     function renderPlanning() {
       const planning = document.getElementById("planning");
       planning.innerHTML = "";
