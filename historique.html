@@ -295,12 +295,26 @@
             <strong>${euro(f.total_amount)}</strong>
           </td>
           <td data-label="Email">
-            ${
-              f.email_sent
-                ? '<span class="tag tag-ok">Envoyé</span>'
-                : '<span class="tag tag-no">Non envoyé</span>'
-            }
-          </td>
+  ${
+    f.email_sent
+      ? '<span class="tag tag-ok">Envoyé</span>'
+      : '<span class="tag tag-no">Non envoyé</span>'
+  }
+</td>
+
+<td data-label="Paiement">
+  ${
+    f.paid
+      ? '<span class="tag tag-ok">Payé</span>'
+      : '<span class="tag tag-no">Non payé</span>'
+  }
+</td>
+
+<td data-label="Action">
+  <button onclick="togglePaiement('${f.id}', ${f.paid})">
+    ${f.paid ? "Annuler paiement" : "Marquer payé"}
+  </button>
+</td>
         `;
 
         tbody.appendChild(tr);
@@ -323,7 +337,19 @@
         afficherLogin();
       }
     }
+async function togglePaiement(id, current) {
+  const { error } = await supabaseClient
+    .from("invoices")
+    .update({ paid: !current })
+    .eq("id", id);
 
+  if (error) {
+    alert("Erreur : " + error.message);
+    return;
+  }
+
+  await chargerFactures();
+}
     verifierSession();
   </script>
 </body>
