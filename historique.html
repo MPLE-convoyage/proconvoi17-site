@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historique des factures - Proconvoi17</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+      color: #1f2937;
+    }
+    .login-box, .history-box {
+      max-width: 1100px;
+      margin: 30px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    input, button, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+    }
+    button {
+      background: #111827;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1f2937;
+    }
+    .logout {
+      background: #b91c1c;
+      max-width: 220px;
+    }
+    .logout:hover {
+      background: #991b1b;
+    }
+    .hidden {
+      display: none;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      white-space: pre-line;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #111827;
+      color: white;
+    }
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .tag-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .tag-no {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .tag-type {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .small {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    @media (max-width: 900px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      tr {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: 14px;
+        padding: 10px;
+      }
+      td {
+        border: none;
+        padding: 8px 4px;
+      }
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginBox" class="login-box">
+    <h1>🔒 Historique des factures - Admin</h1>
+    <p>Entrez le mot de passe admin pour accéder à l’historique.</p>
+    <input id="passwordInput" type="password" placeholder="Mot de passe admin" />
+    <button onclick="verifierMotDePasse()">Se connecter</button>
+    <div id="loginStatus" class="status">Statut : en attente</div>
+  </div>
+
+  <div id="historyBox" class="history-box hidden">
+    <button class="logout" onclick="deconnexion()">Se déconnecter</button>
+    <h2>📄 Historique des factures</h2>
+    <p class="small">Retrouve ici toutes les factures enregistrées depuis le site.</p>
+
+    <div class="toolbar">
+      <input id="searchInput" type="text" placeholder="Rechercher par client, email, société, numéro..." oninput="filtrerFactures()" />
+      <select id="filterType" onchange="filtrerFactures()">
+        <option value="all">Toutes les prestations</option>
+        <option value="convoyage">Convoyage</option>
+        <option value="conducteur">Conducteur PL / SPL</option>
+      </select>
+    </div>
+
+    <div id="historyStatus" class="status">Statut : chargement...</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Coordonnées</th>
+          <th>Prestation</th>
+          <th>Montant</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="historyTableBody"></tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const ADMIN_PASSWORD = "Proconvoi17-Admin-2026";
+    const ADMIN_SESSION_KEY = "proconvoi17_admin_ok";
+
+    const supabaseClient = supabase.createClient(
+      "https://znodbkoakkaucxikkway.supabase.co",
+      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+    );
+
+    let factures = [];
+
+    function euro(v) {
+      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+    }
+
+    function afficherLogin() {
+      document.getElementById("loginBox").classList.remove("hidden");
+      document.getElementById("historyBox").classList.add("hidden");
+    }
+
+    function afficherHistorique() {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("historyBox").classList.remove("hidden");
+    }
+
+    function verifierMotDePasse() {
+      const val = document.getElementById("passwordInput").value;
+      if (val === ADMIN_PASSWORD) {
+        localStorage.setItem(ADMIN_SESSION_KEY, "ok");
+        document.getElementById("loginStatus").innerText = "Statut : connexion réussie.";
+        initialiserHistorique();
+      } else {
+        document.getElementById("loginStatus").innerText = "Statut : mot de passe incorrect.";
+      }
+    }
+
+    function deconnexion() {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      document.getElementById("passwordInput").value = "";
+      afficherLogin();
+    }
+
+    async function chargerFactures() {
+      const { data, error } = await supabaseClient
+        .from("invoices")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        document.getElementById("historyStatus").innerText =
+          "Statut : erreur chargement historique.\n" + error.message;
+        return;
+      }
+
+      factures = data || [];
+      filtrerFactures();
+    }
+
+    function filtrerFactures() {
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      const type = document.getElementById("filterType").value;
+
+      const lignes = factures.filter(f => {
+        const matchText =
+          !q ||
+          (f.invoice_number || "").toLowerCase().includes(q) ||
+          (f.client_name || "").toLowerCase().includes(q) ||
+          (f.client_email || "").toLowerCase().includes(q) ||
+          (f.company || "").toLowerCase().includes(q);
+
+        const matchType = type === "all" || f.service_type === type;
+
+        return matchText && matchType;
+      });
+
+      renderTable(lignes);
+    }
+
+    function renderTable(lignes) {
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = "";
+
+      if (!lignes.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7">Aucune facture trouvée.</td>
+          </tr>
+        `;
+        document.getElementById("historyStatus").innerText =
+          "Statut : aucune facture à afficher.";
+        return;
+      }
+
+      lignes.forEach(f => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td data-label="N°">${f.invoice_number || "-"}</td>
+          <td data-label="Date">${f.created_at_label || "-"}</td>
+          <td data-label="Client">
+            <strong>${f.client_name || "-"}</strong><br>
+            <span class="small">${f.company || ""}</span>
+          </td>
+          <td data-label="Coordonnées">
+            ${f.client_email || "-"}<br>
+            <span class="small">${f.client_phone || ""}</span>
+          </td>
+          <td data-label="Prestation">
+            <span class="tag tag-type">${f.service_type || "-"}</span><br>
+            <span class="small">${f.vehicle_type || "-"}</span>
+          </td>
+          <td data-label="Montant">
+            <strong>${euro(f.total_amount)}</strong>
+          </td>
+          <td data-label="Email">
+            ${
+              f.email_sent
+                ? '<span class="tag tag-ok">Envoyé</span>'
+                : '<span class="tag tag-no">Non envoyé</span>'
+            }
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("historyStatus").innerText =
+        "Statut : " + lignes.length + " facture(s) affichée(s).";
+    }
+
+    async function initialiserHistorique() {
+      afficherHistorique();
+      await chargerFactures();
+    }
+
+    function verifierSession() {
+      const ok = localStorage.getItem(ADMIN_SESSION_KEY) === "ok";
+      if (ok) {
+        initialiserHistorique();
+      } else {
+        afficherLogin();
+      }
+    }
+
+    verifierSession();
+  </script>
+</body>
+</html>
