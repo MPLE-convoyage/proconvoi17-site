@@ -1026,8 +1026,143 @@
       await chargerIndisponibilites();
       renderPlanning();
     }
+async function creerCommandePaypal() {
+  const result = calculMontants();
 
-    initPlanning();
+  if (result.serviceType === "convoyage" && !result.km) {
+    document.getElementById("status").innerText =
+      "Statut : renseigne la distance avant paiement.";
+    throw new Error("Distance manquante");
+  }
+
+  if (result.serviceType === "conducteur" && !result.jours) {
+    document.getElementById("status").innerText =
+      "Statut : renseigne le nombre de jours avant paiement.";
+    throw new Error("Jours manquants");
+  }
+
+  if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
+    document.getElementById("status").innerText =
+      "Statut : date indisponible, paiement impossible.";
+    throw new Error("Date indisponible");
+  }
+
+  if (!derniereFacture?.id) {
+    document.getElementById("status").innerText =
+      "Statut : calcule et sauvegarde d'abord le devis avant paiement.";
+    throw new Error("Facture manquante");
+  }
+
+  const response = await fetch("https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
+      "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+    },
+    body: JSON.stringify({
+      action: "create",
+      amount: result.total.toFixed(2),
+      invoice_id: derniereFacture.id,
+      invoice_number: derniereFacture.invoice_number
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.id) {
+    throw new Error(data.error || "Erreur création commande PayPal");
+  }
+
+  return data.id;
+}
+
+async function capturerCommandePaypal(orderID) {
+  const response = await fetch("https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
+      "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+    },
+    body: JSON.stringify({
+      action: "capture",
+      orderID,
+      invoice_id: derniereFacture.id
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Erreur capture paiement PayPal");
+  }
+
+  return data;
+}
+
+function afficherBoutonPaypalSecurise() {
+  const container = document.getElementById("paypal-button-container");
+  if (!container || !window.paypal) return;
+
+  container.innerHTML = "";
+
+  paypal.Buttons({
+    style: {
+      layout: "vertical",
+      color: "blue",
+      shape: "rect",
+      label: "paypal"
+    },
+
+    createOrder: async function() {
+      try {
+        document.getElementById("status").innerText =
+          "Statut : création de la commande PayPal...";
+        return await creerCommandePaypal();
+      } catch (err) {
+        console.error("Erreur createOrder :", err);
+        document.getElementById("status").innerText =
+          "Statut : erreur création paiement.\n" + err.message;
+        throw err;
+      }
+    },
+
+    onApprove: async function(data) {
+      try {
+        document.getElementById("status").innerText =
+          "Statut : validation du paiement PayPal...";
+        await capturerCommandePaypal(data.orderID);
+
+        derniereFacture.paid = true;
+
+        document.getElementById("status").innerText =
+          "Statut : paiement validé ✅";
+      } catch (err) {
+        console.error("Erreur capture :", err);
+        document.getElementById("status").innerText =
+          "Statut : erreur validation paiement.\n" + err.message;
+      }
+    },
+
+    onCancel: function() {
+      document.getElementById("status").innerText =
+        "Statut : paiement annulé.";
+    },
+
+    onError: function(err) {
+      console.error("Erreur PayPal :", err);
+      document.getElementById("status").innerText =
+        "Statut : erreur PayPal.";
+    }
+  }).render("#paypal-button-container");
+}
+   async function initApp() {
+  await initPlanning();
+  afficherBoutonPaypalSecurise();
+}
+
+initApp();
   </script>
 </body>
 </html>
