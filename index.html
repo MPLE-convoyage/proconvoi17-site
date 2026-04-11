@@ -436,9 +436,14 @@ async function chargerIndisponibilites() {
         return { ...form, base, frais, total };
       }
 
-      const base = form.km * form.tarif;
-      const frais = base * 0.26;
-      const total = base + frais;
+      let base = form.km * form.tarif;
+const frais = base * 0.26;
+let total = base + frais;
+
+// 🔥 Minimum de facturation convoyage
+if (total < 90) {
+  total = 90;
+}
       return { ...form, base, frais, total };
     }
 
