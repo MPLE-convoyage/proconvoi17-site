@@ -5,370 +5,384 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
   <style>
-    :root {
-      --bg: #f3f6fb;
-      --surface: rgba(255,255,255,0.94);
-      --surface-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --primary: #0f172a;
-      --primary-2: #1e293b;
-      --accent: #2563eb;
-      --accent-2: #1d4ed8;
-      --paypal: #0070ba;
-      --paypal-2: #005f99;
-      --success-bg: #dcfce7;
-      --success-text: #166534;
-      --danger-bg: #fee2e2;
-      --danger-text: #991b1b;
-      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-      --radius: 22px;
-    }
+  :root {
+    --surface: rgba(255,255,255,0.94);
+    --surface-2: #f8fafc;
+    --text: #0f172a;
+    --muted: #475569;
+    --line: #e2e8f0;
+    --primary: #0f172a;
+    --accent: #2563eb;
+    --accent-2: #1d4ed8;
+    --paypal: #0070ba;
+    --paypal-2: #005f99;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --danger-bg: #fee2e2;
+    --danger-text: #991b1b;
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    --radius: 22px;
+  }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
-      color: var(--text);
-    }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background:
+      radial-gradient(circle at top, rgba(37,99,235,0.10), transparent 35%),
+      linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
+    color: var(--text);
+  }
 
-    .hero {
-      background: radial-gradient(circle at top, #1e293b, #020617);
-      color: white;
-      padding: 80px 20px;
-      text-align: center;
-    }
+  .hero {
+    background: radial-gradient(circle at top, #1e293b, #020617);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .hero-inner {
-      max-width: 980px;
-      margin: 0 auto;
-    }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,215,0,0.08), transparent 45%);
+    pointer-events: none;
+  }
 
-    .logo {
-  width: min(280px, 75vw);
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 25px 50px rgba(0,0,0,0.4));
-  transition: transform 0.3s ease;
-}
+  .hero-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
 
-.logo:hover {
-  transform: scale(1.05);
+  .logo-wrap {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .logo {
+    width: min(280px, 75vw);
+    height: auto;
+    display: none;
+    margin: 0 auto;
+    filter: drop-shadow(0 25px 50px rgba(0,0,0,0.4));
+    transition: transform 0.3s ease;
+  }
+
+  .logo:hover {
+    transform: scale(1.04);
+  }
+
+  .hero h1 {
+    margin: 0 0 14px;
+    font-size: 42px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero p {
+    margin: 8px 0;
+    color: #dbeafe;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .hero .cta,
+  .hero .cta-secondary {
+    display: inline-block;
+    text-decoration: none;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-weight: bold;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .hero .cta {
+    background: white;
+    color: var(--primary);
+  }
+
+  .hero .cta-secondary {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+
+  .hero .cta:hover,
+  .hero .cta-secondary:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+  }
+
+  .section {
+    max-width: 1160px;
+    margin: 34px auto;
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-size: 30px;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-subtitle {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 860px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 24px;
+  }
+
+  .card,
+  .calendar-box,
+  .cgv-box,
+  .container,
+  .footer-box {
+    background: var(--surface);
+    border: 1px solid rgba(226,232,240,0.95);
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    backdrop-filter: blur(8px);
+  }
+
+  .card {
+    padding: 22px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 46px rgba(15,23,42,0.12);
+  }
+
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+  }
+
+  .card p {
+    margin: 8px 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .highlight {
+    color: var(--danger-text);
+    font-weight: bold;
+  }
+
+  .calendar-box,
+  .cgv-box {
+    padding: 24px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 40px auto;
+    padding: 32px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #dbe4ef;
+    border-radius: 14px;
+    background: #fff;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+  }
+
+  .btn-row,
+  .btn-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px 18px;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+  }
+
+  .primary { background: var(--primary); color: white; }
+  .secondary { background: var(--accent); color: white; }
+  .secondary:hover { background: var(--accent-2); }
+
+  #paypal-button-container {
+    margin-top: 16px;
+    padding: 14px;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+  }
+
+  .result,
+  .status,
+  .invoice-box {
+    margin-top: 22px;
+    padding: 20px;
+    background: var(--surface-2);
+    border-radius: 18px;
+    border: 1px solid var(--line);
+  }
+
+  .result {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .invoice-box div {
+    margin: 8px 0;
+    font-size: 16px;
+  }
+
+  .status {
+    white-space: pre-line;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .planning-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+    max-height: 520px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .planning-day {
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+  }
+
+  .planning-day:hover {
+    transform: scale(1.03);
+  }
+
+  .available {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid #86efac;
+  }
+
+  .unavailable {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid #fca5a5;
+  }
+
+  .small-note {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 12px;
+  }
+
+  ul.clean {
+    padding-left: 18px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .footer {
+    max-width: 1160px;
+    margin: 34px auto 54px;
+    padding: 0 20px;
+  }
+
+  .footer-box {
+    padding: 20px 22px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .hidden { display: none; }
+
+  @media (max-width: 860px) {
+    .grid,
+    .btn-row,
+    .btn-row-2 {
+      grid-template-columns: 1fr;
     }
 
     .hero h1 {
-      margin: 0 0 14px;
-      font-size: 42px;
-      letter-spacing: -0.02em;
-    }
-
-    .hero p {
-      margin: 8px 0;
-      color: #dbeafe;
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 24px;
-    }
-
-    .hero .cta,
-    .hero .cta-secondary {
-      display: inline-block;
-      text-decoration: none;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-weight: bold;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .hero .cta {
-      background: white;
-      color: var(--primary);
-    }
-
-    .hero .cta-secondary {
-      background: rgba(255,255,255,0.12);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .hero .cta:hover,
-    .hero .cta-secondary:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .section {
-      max-width: 1160px;
-      margin: 34px auto;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      font-size: 30px;
-      margin: 0 0 10px;
-      letter-spacing: -0.02em;
-    }
-
-    .section-subtitle {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 860px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-top: 24px;
-    }
-
-    .card,
-    .calendar-box,
-    .cgv-box,
-    .container,
-    .footer-box {
-      background: var(--surface);
-      border: 1px solid rgba(226,232,240,0.95);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-    }
-
-    .card {
-      padding: 22px;
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .card p {
-      margin: 8px 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .highlight {
-      color: var(--danger-text);
-      font-weight: bold;
-    }
-
-    .calendar-box,
-    .cgv-box {
-      padding: 24px;
+      font-size: 34px;
     }
 
     .container {
-      max-width: 860px;
-      margin: 40px auto;
-      padding: 32px;
+      margin: 24px 16px;
+      padding: 24px;
     }
-
-    .grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    label {
-      display: block;
-      margin-top: 18px;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 14px 15px;
-      border: 1px solid #dbe4ef;
-      border-radius: 14px;
-      background: #fff;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 110px;
-    }
-
-    .btn-row,
-    .btn-row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px 18px;
-      border: none;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .secondary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .secondary:hover {
-      background: var(--accent-2);
-    }
-
-    .paypal {
-      margin-top: 14px;
-      background: var(--paypal);
-      color: white;
-    }
-
-    .paypal:hover {
-      background: var(--paypal-2);
-    }
-
-    .result,
-    .status,
-    .invoice-box {
-      margin-top: 22px;
-      padding: 20px;
-      background: var(--surface-2);
-      border-radius: 18px;
-      border: 1px solid var(--line);
-    }
-
-    .result {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .invoice-box div {
-      margin: 8px 0;
-      font-size: 16px;
-    }
-
-    .status {
-      white-space: pre-line;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .planning-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-      max-height: 520px;
-      overflow: auto;
-      padding-right: 4px;
-    }
-
-    .planning-day {
-      padding: 16px;
-      border-radius: 16px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.6;
-      transition: all 0.2s ease;
-    }
-
-    .planning-day:hover {
-      transform: scale(1.03);
-    }
-
-    .available {
-      background: var(--success-bg);
-      color: var(--success-text);
-      border: 1px solid #86efac;
-    }
-
-    .unavailable {
-      background: var(--danger-bg);
-      color: var(--danger-text);
-      border: 1px solid #fca5a5;
-    }
-
-    .small-note {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 12px;
-    }
-
-    ul.clean {
-      padding-left: 18px;
-      line-height: 1.8;
-      color: var(--muted);
-    }
-
-    .footer {
-      max-width: 1160px;
-      margin: 34px auto 54px;
-      padding: 0 20px;
-    }
-
-    .footer-box {
-      padding: 20px 22px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 860px) {
-      .grid,
-      .btn-row,
-      .btn-row-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .hero h1 {
-        font-size: 34px;
-      }
-
-      .container {
-        margin: 24px 16px;
-        padding: 24px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
@@ -632,29 +646,120 @@ async function creerCommandePaypal() {
 }
 
 async function capturerCommandePaypal(orderID) {
-  await fetch(PAYPAL_URL, {
+  const res = await fetch(PAYPAL_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       action: "capture",
       orderID,
       invoice_id: derniereFacture?.id
     })
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Erreur paiement");
+  }
+
+  const dateChoisie = document.getElementById("dateSouhaitee")?.value;
+
+  if (dateChoisie) {
+    const { error } = await supabaseClient
+      .from("unavailable_dates")
+      .upsert([{ date: dateChoisie }], { onConflict: "date" });
+
+    if (error) {
+      console.error("Erreur blocage planning :", error);
+    } else {
+      if (!indisponibilites.includes(dateChoisie)) {
+        indisponibilites.push(dateChoisie);
+      }
+      renderPlanning();
+    }
+  }
+
+  if (derniereFacture?.id) {
+    await supabaseClient
+      .from("invoices")
+      .update({ paid: true })
+      .eq("id", derniereFacture.id);
+  }
+
+  return data;
+}
+  });
 }
 
 function afficherBoutonPaypal() {
+  const container = document.getElementById("paypal-button-container");
+  if (!window.paypal || !container) return;
 
-  if (!window.paypal) return;
+  container.innerHTML = "";
 
   paypal.Buttons({
+    style: {
+      layout: "vertical",
+      color: "gold",
+      shape: "pill",
+      label: "paypal"
+    },
 
-    createOrder: creerCommandePaypal,
+    createOrder: async () => {
+      if (!derniereFacture?.id) {
+        document.getElementById("status").innerText =
+          "Statut : fais d'abord le devis avant de payer.";
+        throw new Error("Facture manquante");
+      }
+
+      const result = calculMontants();
+
+      const res = await fetch(PAYPAL_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create",
+          amount: result.total.toFixed(2),
+          invoice_id: derniereFacture.id
+        })
+      });
+
+      const data = await res.json();
+
+      if (!data.id) {
+        throw new Error("Erreur PayPal");
+      }
+
+      document.getElementById("status").innerText =
+        "Statut : redirection vers PayPal...";
+      return data.id;
+    },
 
     onApprove: async (data) => {
+      document.getElementById("status").innerText =
+        "Statut : validation du paiement...";
+
       await capturerCommandePaypal(data.orderID);
-      alert("Paiement validé ✅");
+
+      document.getElementById("status").innerText =
+        "Statut : paiement validé ✅ et date bloquée dans le planning";
+    },
+
+    onCancel: () => {
+      document.getElementById("status").innerText =
+        "Statut : paiement annulé.";
+    },
+
+    onError: (err) => {
+      console.error(err);
+      document.getElementById("status").innerText =
+        "Statut : erreur paiement.";
     }
+
+  }).render("#paypal-button-container");
+}
 
   }).render('#paypal-button-container');
 }
