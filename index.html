@@ -5,200 +5,447 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      margin: 0;
-      padding: 0;
-      color: #1f2937;
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --primary: #0f172a;
+      --primary-2: #1e293b;
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+      --paypal: #0070ba;
+      --paypal-2: #005f99;
+      --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
     }
-    .hero {
-      background: linear-gradient(135deg, #111827, #1f2937);
-      color: white;
-      padding: 50px 20px;
-      text-align: center;
-    }
-    .hero h1 {
-      margin: 0 0 12px 0;
-      font-size: 38px;
-    }
-    .hero p {
-      margin: 8px 0;
-      color: #e5e7eb;
-      font-size: 18px;
-    }
-    .hero .cta {
-      display: inline-block;
-      margin-top: 20px;
-      background: white;
-      color: #111827;
-      text-decoration: none;
-      padding: 14px 22px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-    .section {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    }
-    .card h3 {
-      margin-top: 0;
-      color: #111827;
-    }
-    .container {
-      max-width: 760px;
-      margin: 40px auto;
-      background: #fff;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
-    h2 {
-      color: #111827;
-    }
-    h3 {
-      color: #111827;
-    }
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      font-weight: 600;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
+
+    * {
       box-sizing: border-box;
     }
-    button {
-      margin-top: 16px;
-      width: 100%;
-      padding: 14px;
-      background: #111827;
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
+      color: var(--text);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
       color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
+      padding: 72px 20px 64px;
+      text-align: center;
     }
-    button:hover {
-      background: #1f2937;
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(30px);
+      opacity: 0.18;
     }
-    .secondary {
-      background: #2563eb;
+
+    .hero::before {
+      width: 280px;
+      height: 280px;
+      background: #60a5fa;
+      top: -80px;
+      left: -40px;
     }
-    .secondary:hover {
-      background: #1d4ed8;
+
+    .hero::after {
+      width: 260px;
+      height: 260px;
+      background: #38bdf8;
+      right: -60px;
+      bottom: -80px;
     }
-    .paypal {
-      background: #0070ba;
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
     }
-    .paypal:hover {
-      background: #005f99;
+
+    .badge {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #e2e8f0;
+      font-size: 14px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(8px);
     }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: 42px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 10px 0;
+      color: #dbeafe;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .hero .cta,
+    .hero .cta-secondary {
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .hero .cta {
+      background: white;
+      color: var(--primary);
+    }
+
+    .hero .cta-secondary {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .hero .cta:hover,
+    .hero .cta-secondary:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .section {
+      max-width: 1160px;
+      margin: 34px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 860px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(226,232,240,0.9);
+      backdrop-filter: blur(8px);
+      padding: 22px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 50px rgba(15, 23, 42, 0.1);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 8px 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .highlight {
+      color: var(--danger-text);
+      font-weight: bold;
+    }
+
+    .calendar-box,
+    .cgv-box,
+    .container {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(226,232,240,0.95);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+    }
+
+    .calendar-box,
+    .cgv-box {
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 28px;
+    }
+
     .grid {
       display: grid;
       gap: 14px;
       grid-template-columns: 1fr 1fr;
     }
-    .result, .status, .invoice-box, .calendar-box, .cgv-box {
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid #dbe4ef;
+      border-radius: 14px;
+      background: #fff;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .secondary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary:hover {
+      background: var(--accent-2);
+    }
+
+    .paypal {
+      background: var(--paypal);
+      color: white;
+    }
+
+    .paypal:hover {
+      background: var(--paypal-2);
+    }
+
+    .result,
+    .status,
+    .invoice-box {
       margin-top: 20px;
-      padding: 16px;
-      background: #f9fafb;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
+      padding: 18px;
+      background: var(--surface-2);
+      border-radius: 16px;
+      border: 1px solid var(--line);
     }
+
     .result {
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
+
+    .invoice-box div {
+      margin: 8px 0;
+    }
+
     .status {
       white-space: pre-line;
       font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
     }
-    .invoice-box div {
-      margin: 6px 0;
-    }
-    .hidden {
-      display: none;
-    }
-    .footer {
-      max-width: 1100px;
-      margin: 30px auto 50px auto;
-      padding: 0 20px;
-      color: #4b5563;
-      font-size: 14px;
-    }
+
     .planning-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      gap: 12px;
+      margin-top: 18px;
     }
+
     .planning-day {
-      padding: 12px;
-      border-radius: 10px;
+      padding: 16px;
+      border-radius: 14px;
       font-weight: bold;
       text-align: center;
+      line-height: 1.6;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
     }
+
     .available {
-      background: #dcfce7;
-      color: #166534;
+      background: var(--success-bg);
+      color: var(--success-text);
       border: 1px solid #86efac;
     }
+
     .unavailable {
-      background: #fee2e2;
-      color: #991b1b;
+      background: var(--danger-bg);
+      color: var(--danger-text);
       border: 1px solid #fca5a5;
     }
+
     .small-note {
       font-size: 13px;
-      color: #6b7280;
-      margin-top: 10px;
+      color: #64748b;
+      margin-top: 12px;
     }
+
     ul.clean {
       padding-left: 18px;
-      line-height: 1.6;
+      line-height: 1.8;
+      color: var(--muted);
     }
-    @media (max-width: 700px) {
-      .container { margin: 20px; }
-      .grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 30px; }
+
+    .footer {
+      max-width: 1160px;
+      margin: 34px auto 54px;
+      padding: 0 20px;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .footer-box {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(226,232,240,0.9);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 20px 22px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 860px) {
+      .grid,
+      .btn-row,
+      .btn-row-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+      }
+
+      .section-title {
+        font-size: 26px;
+      }
+
+      .container {
+        margin: 24px 16px;
+        padding: 22px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="hero">
-    <h1>🚛 Proconvoi17</h1>
-    <p>Convoyage de véhicules VL / PL / SPL</p>
-    <p>Conducteur PL / SPL indépendant</p>
-    <p>Devis rapide, planning, PDF, paiement PayPal et envoi par email</p>
-    <a href="#devis" class="cta">Demander un devis</a>
+    <div class="hero-inner">
+      <div class="badge">Convoyage VL / PL / SPL • Conducteur PL / SPL</div>
+      <h1>Proconvoi17</h1>
+      <p>Convoyage de véhicules VL / PL / SPL et conducteur PL / SPL indépendant.</p>
+      <p>Devis rapide, planning, PDF, paiement PayPal et envoi par email.</p>
+
+      <div class="hero-actions">
+        <a href="#devis" class="cta">Demander un devis</a>
+        <a href="#planning" class="cta-secondary">Voir le planning</a>
+      </div>
+    </div>
   </div>
 
   <div class="section">
-    <h2>Présentation</h2>
-    <p>
+    <h2 class="section-title">Présentation</h2>
+    <p class="section-subtitle">
       Proconvoi17 vous accompagne pour le convoyage de véhicules légers, poids lourds et super poids lourds,
-      ainsi que pour les missions de conducteur PL / SPL indépendant.
-      Le site permet de calculer rapidement un devis, d’éditer un devis PDF, une facture PDF,
-      d’envoyer la facture par email et de proposer un paiement PayPal.
+      ainsi que pour les missions de conducteur PL / SPL indépendant. Le site permet de calculer rapidement
+      un devis, d’éditer un devis PDF, une facture PDF, d’envoyer la facture par email et de proposer un paiement PayPal.
     </p>
 
     <div class="cards">
@@ -206,19 +453,22 @@
         <h3>Convoyage VL</h3>
         <p>Tarif : <strong>0,98 € / km</strong></p>
         <p>+ <strong>26%</strong> de frais de route</p>
+        <p class="highlight">Minimum de facturation : 90 €</p>
       </div>
-      <p><strong>Minimum de facturation : 90 €</strong></p>
+
       <div class="card">
         <h3>Convoyage PL / SPL</h3>
         <p>Tarif : <strong>2,20 € / km</strong></p>
         <p>+ <strong>26%</strong> de frais de route</p>
+        <p class="highlight">Minimum de facturation : 90 €</p>
       </div>
-      <p><strong>Minimum de facturation : 90 €</strong></p>
+
       <div class="card">
         <h3>Conducteur PL / SPL</h3>
-        <p>Tarif journalier : <strong>320 € / jour</strong></p>
+        <p>Tarif journalier : <strong>340 € / jour</strong></p>
         <p>Découché : <strong>90 €</strong></p>
       </div>
+
       <div class="card">
         <h3>Pourquoi nous choisir</h3>
         <p>Réactivité, professionnalisme, devis rapide, paiement simple et suivi administratif.</p>
@@ -226,11 +476,11 @@
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="planning">
     <div class="calendar-box">
-      <h2>Planning de disponibilité</h2>
-      <p>Consultez rapidement les prochains jours disponibles et indisponibles.</p>
-      <div id="planning" class="planning-list"></div>
+      <h2 class="section-title" style="font-size:26px; margin-bottom:8px;">Planning de disponibilité</h2>
+      <p class="section-subtitle">Consultez rapidement les 45 prochains jours disponibles et indisponibles.</p>
+      <div id="planningList" class="planning-list"></div>
       <div class="small-note">
         Les jours en vert sont disponibles. Les jours en rouge sont indisponibles.
       </div>
@@ -238,7 +488,10 @@
   </div>
 
   <div class="container" id="devis">
-    <h2>Demande de devis</h2>
+    <h2 class="section-title" style="font-size:28px; margin-bottom:8px;">Demande de devis</h2>
+    <p class="section-subtitle" style="margin-bottom:16px;">
+      Remplissez le formulaire pour obtenir une estimation rapide et générer vos documents.
+    </p>
 
     <div class="grid">
       <div>
@@ -290,10 +543,16 @@
     <label for="message">Informations complémentaires</label>
     <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
 
-    <button onclick="calculer()">Calculer et sauvegarder</button>
-    <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
-    <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
-    <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
+    <div class="btn-row">
+      <button class="primary" onclick="calculer()">Calculer et sauvegarder</button>
+      <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
+    </div>
+
+    <div class="btn-row-2">
+      <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
+      <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
+    </div>
+
     <button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
 
     <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
@@ -308,13 +567,13 @@
 
   <div class="section">
     <div class="cgv-box">
-      <h2>Conditions Générales de Vente</h2>
+      <h2 class="section-title" style="font-size:26px; margin-bottom:8px;">Conditions Générales de Vente</h2>
       <ul class="clean">
-        <li>Un minimum de facturation de 90 € est appliqué pour toute prestation de convoyage, quelle que soit la distance.</li>
         <li>Les prestations proposées concernent le convoyage VL, PL, SPL ainsi que les missions de conducteur PL / SPL indépendant.</li>
         <li>Les tarifs affichés sont donnés à titre indicatif selon les éléments fournis par le client.</li>
+        <li>Un minimum de facturation de 90 € est appliqué pour toute prestation de convoyage, quelle que soit la distance.</li>
         <li>Pour le convoyage, les frais de route s’ajoutent au tarif kilométrique à hauteur de 26%.</li>
-        <li>Pour les missions conducteur PL / SPL, le tarif est de 320 € par jour et 90 € par découché.</li>
+        <li>Pour les missions conducteur PL / SPL, le tarif est de 340 € par jour et 90 € par découché.</li>
         <li>Le paiement peut être demandé avant ou à l’issue de la prestation selon accord préalable.</li>
         <li>Le client doit fournir des informations exactes pour l’établissement du devis et de la facture.</li>
         <li>En cas d’annulation tardive, des frais peuvent être appliqués selon l’avancement de l’organisation.</li>
@@ -325,10 +584,12 @@
   </div>
 
   <div class="footer">
-    <p><strong>Proconvoi17</strong> – Auto-entrepreneur</p>
-    <p>SIRET : 532 293 461 00044</p>
-    <p>Email : mickaelple066@gmail.com</p>
-    <p>Téléphone : 0763082637</p>
+    <div class="footer-box">
+      <p><strong>Proconvoi17</strong> – Auto-entrepreneur</p>
+      <p>SIRET : 532 293 461 00044</p>
+      <p>Email : mickaelple066@gmail.com</p>
+      <p>Téléphone : 0763082637</p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -346,7 +607,6 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
 
     let indisponibilites = [];
-
     let derniereFacture = null;
 
     function euro(v) {
@@ -379,21 +639,23 @@
         year: "numeric"
       });
     }
-async function chargerIndisponibilites() {
-  const { data, error } = await supabaseClient
-    .from("unavailable_dates")
-    .select("date")
-    .order("date", { ascending: true });
 
-  if (error) {
-    console.error("Erreur chargement planning :", error);
-    return;
-  }
+    async function chargerIndisponibilites() {
+      const { data, error } = await supabaseClient
+        .from("unavailable_dates")
+        .select("date")
+        .order("date", { ascending: true });
 
-  indisponibilites = data.map(item => item.date);
-}
+      if (error) {
+        console.error("Erreur chargement planning :", error);
+        return;
+      }
+
+      indisponibilites = data.map(item => item.date);
+    }
+
     function renderPlanning() {
-      const planning = document.getElementById("planning");
+      const planning = document.getElementById("planningList");
       planning.innerHTML = "";
 
       for (let i = 0; i < 45; i++) {
@@ -433,20 +695,20 @@ async function chargerIndisponibilites() {
       const form = lireFormulaire();
 
       if (form.serviceType === "conducteur") {
-        const base = form.jours * 320;
+        const base = form.jours * 340;
         const frais = form.decouches * 90;
         const total = base + frais;
         return { ...form, base, frais, total };
       }
 
       let base = form.km * form.tarif;
-const frais = base * 0.26;
-let total = base + frais;
+      const frais = base * 0.26;
+      let total = base + frais;
 
-// 🔥 Minimum de facturation convoyage
-if (total < 90) {
-  total = 90;
-}
+      if (total < 90) {
+        total = 90;
+      }
+
       return { ...form, base, frais, total };
     }
 
@@ -633,6 +895,9 @@ if (total < 90) {
         line(`Distance : ${derniereFacture.distance_km || 0} km`);
         line(`Base transport : ${euro(derniereFacture.base_amount)}`);
         line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
+        if ((derniereFacture.total_amount || 0) === 90) {
+          line(`Minimum de facturation appliqué : 90,00 €`);
+        }
       }
 
       const dateChoisie = document.getElementById("dateSouhaitee").value;
@@ -798,11 +1063,11 @@ if (total < 90) {
     }
 
     async function initPlanning() {
-  await chargerIndisponibilites();
-  renderPlanning();
-}
+      await chargerIndisponibilites();
+      renderPlanning();
+    }
 
-initPlanning();
+    initPlanning();
   </script>
 </body>
 </html>
