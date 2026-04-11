@@ -552,638 +552,78 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR"></script>
   <script>
-    const supabaseClient = supabase.createClient(
-      "https://znodbkoakkaucxikkway.supabase.co",
-      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-    );
 
-    const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
-    
-    const SUPABASE_ANON_JWT =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
+const supabaseClient = supabase.createClient(
+  "https://znodbkoakkaucxikkway.supabase.co",
+  "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+);
 
-    const NB_JOURS_PLANNING = 45;
+const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
 
-    let indisponibilites = [];
-    let derniereFacture = null;
+let derniereFacture = null;
 
-    function euro(v) {
-      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
-    }
+// ---------------- CALCUL ----------------
 
-    function montantPaypal(v) {
-      return Number(v || 0).toFixed(2);
-    }
+function calculMontants() {
+  const km = parseFloat(document.getElementById("km")?.value || 0);
+  const tarif = parseFloat(document.getElementById("type")?.value || 0);
 
-    function buildInvoiceNumber() {
-      const d = new Date();
-      const year = d.getFullYear();
-      const stamp = String(Date.now()).slice(-6);
-      return `FAC-${year}-${stamp}`;
-    }
+  let base = km * tarif;
+  let frais = base * 0.26;
+  let total = base + frais;
 
-    function changerMode() {
-      const mode = document.getElementById("serviceType").value;
-      document.getElementById("blocConvoyage").classList.toggle("hidden", mode !== "convoyage");
-      document.getElementById("blocConducteur").classList.toggle("hidden", mode !== "conducteur");
-    }
+  if (total < 90) total = 90;
 
-    function formatDateFr(dateString) {
-      const d = new Date(dateString);
-      return d.toLocaleDateString("fr-FR", {
-        weekday: "long",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      });
-    }
+  return { base, frais, total };
+}
 
-    async function chargerIndisponibilites() {
-      const { data, error } = await supabaseClient
-        .from("unavailable_dates")
-        .select("date")
-        .order("date", { ascending: true });
+// ---------------- CALCUL + SAVE ----------------
 
-      if (error) {
-        console.error("Erreur chargement planning :", error);
-        return;
-      }
+async function calculer() {
 
-      indisponibilites = (data || []).map(item => item.date);
-    }
-
-    function renderPlanning() {
-      const planning = document.getElementById("planningList");
-      planning.innerHTML = "";
-
-      for (let i = 0; i < NB_JOURS_PLANNING; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        const iso = d.toISOString().split("T")[0];
-        const isUnavailable = indisponibilites.includes(iso);
-
-        const item = document.createElement("div");
-        item.className = "planning-day " + (isUnavailable ? "unavailable" : "available");
-        item.innerHTML = `
-          <div style="font-size:14px;">${formatDateFr(iso)}</div>
-          <div style="margin-top:6px; font-size:13px;">
-            ${isUnavailable ? "❌ Indisponible" : "✅ Disponible"}
-          </div>
-        `;
-        planning.appendChild(item);
-      }
-    }
-
-    function lireFormulaire() {
-      return {
-        serviceType: document.getElementById("serviceType").value,
-        clientName: document.getElementById("clientName").value.trim(),
-        clientEmail: document.getElementById("clientEmail").value.trim(),
-        clientPhone: document.getElementById("clientPhone").value.trim(),
-        company: document.getElementById("company").value.trim(),
-        vehicleText: document.getElementById("type").selectedOptions[0].text,
-        tarif: parseFloat(document.getElementById("type").value) || 0,
-        km: parseFloat(document.getElementById("km").value) || 0,
-        jours: parseFloat(document.getElementById("jours").value) || 0,
-        decouches: parseFloat(document.getElementById("decouches").value) || 0,
-        dateSouhaitee: document.getElementById("dateSouhaitee").value,
-        message: document.getElementById("message").value.trim()
-      };
-    }
-
-    function calculMontants() {
-      const form = lireFormulaire();
-
-      if (form.serviceType === "conducteur") {
-        const base = form.jours * 340;
-        const frais = form.decouches * 90;
-        const total = base + frais;
-        return { ...form, base, frais, total };
-      }
-
-      let base = form.km * form.tarif;
-      const frais = base * 0.26;
-      let total = base + frais;
-
-      if (total < 90) {
-        total = 90;
-      }
-
-      return { ...form, base, frais, total };
-    }
-
-    function majAffichage(result) {
-      document.getElementById("resultat").innerText =
-        "Montant estimatif : " + euro(result.total);
-
-      document.getElementById("invoiceNumber").innerText =
-        derniereFacture?.invoice_number || "-";
-
-      document.getElementById("emailStatus").innerText =
-        derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
-    }
-
-    async function calculer() {
-      const result = calculMontants();
-
-      if (!result.clientName || !result.clientEmail) {
-        document.getElementById("status").innerText =
-          "Statut : merci de renseigner le nom et l’email.";
-        return;
-      }
-
-      if (result.serviceType === "convoyage" && !result.km) {
-        document.getElementById("status").innerText =
-          "Statut : merci de renseigner la distance.";
-        return;
-      }
-
-      if (result.serviceType === "conducteur" && !result.jours) {
-        document.getElementById("status").innerText =
-          "Statut : merci de renseigner le nombre de jours.";
-        return;
-      }
-
-      if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
-        document.getElementById("status").innerText =
-          "Statut : la date choisie est actuellement indisponible.";
-        return;
-      }
-
-      const invoiceNumber = buildInvoiceNumber();
-
-      const payload = {
-        invoice_number: invoiceNumber,
-        created_at_label: new Date().toLocaleDateString("fr-FR"),
-        service_type: result.serviceType,
-        vehicle_type: result.serviceType === "convoyage" ? result.vehicleText : "Conducteur PL / SPL",
-        distance_km: result.serviceType === "convoyage" ? result.km : null,
-        days: result.serviceType === "conducteur" ? result.jours : null,
-        overnights: result.serviceType === "conducteur" ? result.decouches : null,
-        client_name: result.clientName,
-        company: result.company,
-        client_email: result.clientEmail,
-        client_phone: result.clientPhone,
-        message: result.message,
-        base_amount: result.base,
-        fees_amount: result.frais,
-        total_amount: result.total,
-        email_sent: false
-      };
-
-      const { data, error } = await supabaseClient
-        .from("invoices")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("❌ Erreur Supabase:", error);
-        document.getElementById("status").innerText =
-          "Statut : erreur de sauvegarde.\n" + error.message;
-        return;
-      }
-
-      derniereFacture = data;
-      majAffichage(result);
-
-      document.getElementById("status").innerText =
-        "Statut : devis sauvegardé.\nNuméro : " + data.invoice_number;
-    }
-
-    function headerPdf(pdf, titre, numero) {
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      let y = 20;
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(20);
-      pdf.text(titre, 20, y);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      pdf.text(`N° ${numero || "-"}`, pageWidth - 70, y);
-      y += 10;
-
-      pdf.setFontSize(10);
-      pdf.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
-      y += 10;
-
-      return y;
-    }
-
-    function buildDocumentBlob(typeDocument) {
-      if (!derniereFacture) return null;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-
-      let y = headerPdf(pdf, typeDocument, derniereFacture.invoice_number);
-
-      const line = (text, x = 20, jump = 7) => {
-        pdf.text(String(text), x, y);
-        y += jump;
-      };
-
-      const hr = () => {
-        pdf.setDrawColor(180);
-        pdf.line(20, y, pageWidth - 20, y);
-        y += 8;
-      };
-
-      const box = (title, lines, startY) => {
-        const x = title === "CLIENT" ? 110 : 20;
-        const w = 80;
-        const h = 10 + lines.length * 7 + 6;
-
-        pdf.setDrawColor(200);
-        pdf.rect(x, startY, w, h);
-
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(11);
-        pdf.text(title, x + 4, startY + 7);
-
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-
-        let ly = startY + 15;
-        lines.forEach((l) => {
-          pdf.text(String(l), x + 4, ly);
-          ly += 7;
-        });
-
-        return h;
-      };
-
-      const companyLines = [
-        "Proconvoi17",
-        "Auto-entrepreneur",
-        "SIRET : 532 293 461 00044",
-        "Téléphone : 0763082637",
-        "Email : mickaelple066@gmail.com"
-      ];
-
-      const clientLines = [
-        `Nom : ${derniereFacture.client_name || "-"}`,
-        `Société : ${derniereFacture.company || "-"}`,
-        `Téléphone : ${derniereFacture.client_phone || "-"}`,
-        `Email : ${derniereFacture.client_email || "-"}`
-      ];
-
-      const boxY = y;
-      const h1 = box("PRESTATAIRE", companyLines, boxY);
-      const h2 = box("CLIENT", clientLines, boxY);
-      y += Math.max(h1, h2) + 10;
-
-      hr();
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(12);
-      line(`DÉTAIL DU ${typeDocument}`, 20, 9);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
-
-      if (derniereFacture.service_type === "conducteur") {
-        line("Type : Conducteur PL / SPL");
-        line(`Nombre de jours : ${derniereFacture.days || 0}`);
-        line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
-        line(`Base mission : ${euro(derniereFacture.base_amount)}`);
-        line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
-      } else {
-        line(`Type : ${derniereFacture.vehicle_type || "-"}`);
-        line(`Distance : ${derniereFacture.distance_km || 0} km`);
-        line(`Base transport : ${euro(derniereFacture.base_amount)}`);
-        line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
-        if ((derniereFacture.total_amount || 0) === 90) {
-          line(`Minimum de facturation appliqué : 90,00 €`);
-        }
-      }
-
-      const dateChoisie = document.getElementById("dateSouhaitee").value;
-      if (dateChoisie) {
-        line(`Date souhaitée : ${formatDateFr(dateChoisie)}`);
-      }
-
-      if (derniereFacture.message) {
-        y += 2;
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Informations complémentaires :", 20, y);
-        y += 7;
-        pdf.setFont("helvetica", "normal");
-        const split = pdf.splitTextToSize(derniereFacture.message, 170);
-        pdf.text(split, 20, y);
-        y += split.length * 6 + 4;
-      }
-
-      hr();
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text(typeDocument === "DEVIS" ? "TOTAL ESTIMATIF" : "TOTAL À PAYER", 20, y);
-
-      pdf.setFontSize(16);
-      pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
-      y += 12;
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(9);
-      pdf.text("TVA non applicable, article 293 B du CGI.", 20, y);
-      y += 6;
-      pdf.text("Merci pour votre confiance.", 20, y);
-
-      return pdf.output("blob");
-    }
-
-    async function telechargerDevis() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis.";
-        return;
-      }
-
-      const blob = buildDocumentBlob("DEVIS");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `devis-${derniereFacture.invoice_number}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      document.getElementById("status").innerText =
-        "Statut : devis PDF téléchargé.";
-    }
-
-    async function telechargerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis.";
-        return;
-      }
-
-      const blob = buildDocumentBlob("FACTURE");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `facture-${derniereFacture.invoice_number}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      document.getElementById("status").innerText =
-        "Statut : facture PDF téléchargée.";
-    }
-
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = String(reader.result || "");
-          resolve(result.split(",")[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function envoyerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis avant l’envoi.";
-        return;
-      }
-
-      try {
-        const pdfBlob = buildDocumentBlob("FACTURE");
-        const pdfBase64 = await blobToBase64(pdfBlob);
-
-        const response = await fetch(EMAIL_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_ANON_JWT,
-            "Authorization": "Bearer " + SUPABASE_ANON_JWT
-          },
-          body: JSON.stringify({
-            to: derniereFacture.client_email,
-            subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
-            text:
-              "Bonjour " + derniereFacture.client_name + ",\n\n" +
-              "Veuillez trouver votre facture " + derniereFacture.invoice_number +
-              " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
-              "Cordialement,\nProconvoi17",
-            filename: derniereFacture.invoice_number + ".pdf",
-            pdfBase64
-          })
-        });
-
-        const responseText = await response.text();
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " - " + responseText);
-        }
-
-        await supabaseClient
-          .from("invoices")
-          .update({ email_sent: true })
-          .eq("id", derniereFacture.id);
-
-        derniereFacture.email_sent = true;
-        document.getElementById("emailStatus").innerText = "Envoyé";
-        document.getElementById("status").innerText =
-          "Statut : facture envoyée par email à " + derniereFacture.client_email;
-      } catch (err) {
-        console.error("❌ Erreur email:", err);
-        document.getElementById("status").innerText =
-          "Statut : erreur d’envoi email.\n" + err.message;
-      }
-    }
-
-    function payerPaypal() {
-      const result = calculMontants();
-
-      if (result.serviceType === "convoyage" && !result.km) {
-        document.getElementById("status").innerText =
-          "Statut : renseigne la distance avant paiement.";
-        return;
-      }
-
-      if (result.serviceType === "conducteur" && !result.jours) {
-        document.getElementById("status").innerText =
-          "Statut : renseigne le nombre de jours avant paiement.";
-        return;
-      }
-
-      if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
-        document.getElementById("status").innerText =
-          "Statut : date indisponible, paiement impossible.";
-        return;
-      }
-
-      window.open(`${PAYPAL_BASE}/${montantPaypal(result.total)}`, "_blank");
-    }
-
-    async function initPlanning() {
-      await chargerIndisponibilites();
-      renderPlanning();
-    }
-async function creerCommandePaypal() {
   const result = calculMontants();
 
-  if (result.serviceType === "convoyage" && !result.km) {
-    document.getElementById("status").innerText =
-      "Statut : renseigne la distance avant paiement.";
-    throw new Error("Distance manquante");
+  const payload = {
+    invoice_number: "FAC-" + Date.now(),
+    total_amount: result.total,
+    email_sent: false
+  };
+
+  const { data, error } = await supabaseClient
+    .from("invoices")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    alert("Erreur sauvegarde");
+    return;
   }
 
-  if (result.serviceType === "conducteur" && !result.jours) {
-    document.getElementById("status").innerText =
-      "Statut : renseigne le nombre de jours avant paiement.";
-    throw new Error("Jours manquants");
-  }
+  derniereFacture = data;
 
-  if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
-    document.getElementById("status").innerText =
-      "Statut : date indisponible, paiement impossible.";
-    throw new Error("Date indisponible");
-  }
+  document.getElementById("resultat").innerText =
+    "Montant estimatif : " + result.total.toFixed(2) + " €";
 
-  if (!derniereFacture?.id) {
-    document.getElementById("status").innerText =
-      "Statut : calcule et sauvegarde d'abord le devis avant paiement.";
-    throw new Error("Facture manquante");
-  }
+  document.getElementById("status").innerText =
+    "Devis sauvegardé";
 
-  const response = await fetch("https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
-      "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-    },
-    body: JSON.stringify({
-      action: "create",
-      amount: result.total.toFixed(2),
-      invoice_id: derniereFacture.id,
-      invoice_number: derniereFacture.invoice_number
-    })
-  });
-
-  const data = await response.json();
-
-  if (!response.ok || !data.id) {
-    throw new Error(data.error || "Erreur création commande PayPal");
-  }
-
-  return data.id;
+  afficherBoutonPaypal();
 }
 
-async function capturerCommandePaypal(orderID) {
-  const response = await fetch("https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1",
-      "Authorization": "Bearer sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-    },
-    body: JSON.stringify({
-      action: "capture",
-      orderID,
-      invoice_id: derniereFacture.id
-    })
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || "Erreur capture paiement PayPal");
-  }
-
-  return data;
-}
-
-function afficherBoutonPaypalSecurise() {
-  const container = document.getElementById("paypal-button-container");
-  if (!container || !window.paypal) return;
-
-  container.innerHTML = "";
-
-  paypal.Buttons({
-    style: {
-      layout: "vertical",
-      color: "blue",
-      shape: "rect",
-      label: "paypal"
-    },
-
-    createOrder: async function() {
-      try {
-        document.getElementById("status").innerText =
-          "Statut : création de la commande PayPal...";
-        return await creerCommandePaypal();
-      } catch (err) {
-        console.error("Erreur createOrder :", err);
-        document.getElementById("status").innerText =
-          "Statut : erreur création paiement.\n" + err.message;
-        throw err;
-      }
-    },
-
-    onApprove: async function(data) {
-      try {
-        document.getElementById("status").innerText =
-          "Statut : validation du paiement PayPal...";
-        await capturerCommandePaypal(data.orderID);
-
-        derniereFacture.paid = true;
-
-        document.getElementById("status").innerText =
-          "Statut : paiement validé ✅";
-      } catch (err) {
-        console.error("Erreur capture :", err);
-        document.getElementById("status").innerText =
-          "Statut : erreur validation paiement.\n" + err.message;
-      }
-    },
-
-    onCancel: function() {
-      document.getElementById("status").innerText =
-        "Statut : paiement annulé.";
-    },
-
-    onError: function(err) {
-      console.error("Erreur PayPal :", err);
-      document.getElementById("status").innerText =
-        "Statut : erreur PayPal.";
-    }
-  }).render("#paypal-button-container");
-}
-   async function initApp() {
-  await initPlanning();
-  afficherBoutonPaypalSecurise();
-}
-
-initApp();
-    const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
+// ---------------- PAYPAL ----------------
 
 async function creerCommandePaypal() {
-  const result = calculMontants();
 
-  if (!derniereFacture?.id) {
-    document.getElementById("status").innerText =
-      "Statut : fais d'abord le devis avant de payer.";
-    throw new Error("Facture manquante");
-  }
+  const result = calculMontants();
 
   const res = await fetch(PAYPAL_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       action: "create",
       amount: result.total.toFixed(2),
-      invoice_id: derniereFacture.id,
-      invoice_number: derniereFacture.invoice_number
+      invoice_id: derniereFacture?.id
     })
   });
 
@@ -1194,31 +634,32 @@ async function creerCommandePaypal() {
 async function capturerCommandePaypal(orderID) {
   await fetch(PAYPAL_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       action: "capture",
       orderID,
-      invoice_id: derniereFacture.id
+      invoice_id: derniereFacture?.id
     })
   });
 }
 
 function afficherBoutonPaypal() {
+
   if (!window.paypal) return;
 
   paypal.Buttons({
+
     createOrder: creerCommandePaypal,
 
     onApprove: async (data) => {
-      document.getElementById("status").innerText = "Paiement en cours...";
       await capturerCommandePaypal(data.orderID);
-      document.getElementById("status").innerText = "Paiement validé ✅";
+      alert("Paiement validé ✅");
     }
 
   }).render('#paypal-button-container');
 }
-  </script>
+
+</script>
+   
 </body>
 </html>
