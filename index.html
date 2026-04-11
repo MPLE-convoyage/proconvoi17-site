@@ -550,7 +550,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
+<script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR"></script>
   <script>
     const supabaseClient = supabase.createClient(
       "https://znodbkoakkaucxikkway.supabase.co",
@@ -558,7 +558,7 @@
     );
 
     const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
-    const PAYPAL_BASE = "https://paypal.me/proconvoi";
+    
     const SUPABASE_ANON_JWT =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub2Ria29ha2thdWN4aWtrd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MDQwOTQsImV4cCI6MjA5MTA4MDA5NH0.pao1dfiq5CJgRmU3HMGVw5LpEmpAy4PKarxnPQc_Fjk";
 
@@ -1163,6 +1163,62 @@ function afficherBoutonPaypalSecurise() {
 }
 
 initApp();
+    const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
+
+async function creerCommandePaypal() {
+  const result = calculMontants();
+
+  if (!derniereFacture?.id) {
+    document.getElementById("status").innerText =
+      "Statut : fais d'abord le devis avant de payer.";
+    throw new Error("Facture manquante");
+  }
+
+  const res = await fetch(PAYPAL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "create",
+      amount: result.total.toFixed(2),
+      invoice_id: derniereFacture.id,
+      invoice_number: derniereFacture.invoice_number
+    })
+  });
+
+  const data = await res.json();
+  return data.id;
+}
+
+async function capturerCommandePaypal(orderID) {
+  await fetch(PAYPAL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "capture",
+      orderID,
+      invoice_id: derniereFacture.id
+    })
+  });
+}
+
+function afficherBoutonPaypal() {
+  if (!window.paypal) return;
+
+  paypal.Buttons({
+    createOrder: creerCommandePaypal,
+
+    onApprove: async (data) => {
+      document.getElementById("status").innerText = "Paiement en cours...";
+      await capturerCommandePaypal(data.orderID);
+      document.getElementById("status").innerText = "Paiement validé ✅";
+    }
+
+  }).render('#paypal-button-container');
+}
   </script>
 </body>
 </html>
