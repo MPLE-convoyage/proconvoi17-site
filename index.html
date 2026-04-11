@@ -5,424 +5,325 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
   <style>
-    :root {
-      --bg: #f4f7fb;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --primary: #0f172a;
-      --primary-2: #1e293b;
-      --accent: #2563eb;
-      --accent-2: #1d4ed8;
-      --success-bg: #dcfce7;
-      --success-text: #166534;
-      --danger-bg: #fee2e2;
-      --danger-text: #991b1b;
-      --paypal: #0070ba;
-      --paypal-2: #005f99;
-      --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-      --radius: 18px;
-    }
+  :root {
+    --bg: #f3f6fb;
+    --surface: rgba(255,255,255,0.92);
+    --surface-2: #f8fafc;
+    --text: #0f172a;
+    --muted: #475569;
+    --line: #e2e8f0;
+    --primary: #0f172a;
+    --primary-2: #1e293b;
+    --accent: #2563eb;
+    --accent-2: #1d4ed8;
+    --paypal: #0070ba;
+    --paypal-2: #005f99;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --danger-bg: #fee2e2;
+    --danger-text: #991b1b;
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    --radius: 22px;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  * { box-sizing: border-box; }
 
-    html {
-      scroll-behavior: smooth;
-    }
+  html { scroll-behavior: smooth; }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
-      color: var(--text);
-    }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
+    color: var(--text);
+  }
 
-    .hero {
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
-      color: white;
-      padding: 72px 20px 64px;
-      text-align: center;
-    }
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+    color: white;
+    padding: 72px 20px 64px;
+    text-align: center;
+  }
 
-    .hero::before,
-    .hero::after {
-      content: "";
-      position: absolute;
-      border-radius: 999px;
-      filter: blur(30px);
-      opacity: 0.18;
-    }
+  .hero h1 {
+    margin: 0 0 14px;
+    font-size: 42px;
+    letter-spacing: -0.02em;
+  }
 
-    .hero::before {
-      width: 280px;
-      height: 280px;
-      background: #60a5fa;
-      top: -80px;
-      left: -40px;
-    }
+  .hero p {
+    margin: 8px 0;
+    color: #dbeafe;
+    font-size: 18px;
+    line-height: 1.6;
+  }
 
-    .hero::after {
-      width: 260px;
-      height: 260px;
-      background: #38bdf8;
-      right: -60px;
-      bottom: -80px;
-    }
+  .hero .cta {
+    display: inline-block;
+    margin-top: 22px;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-weight: bold;
+  }
 
-    .hero-inner {
-      position: relative;
-      z-index: 1;
-      max-width: 980px;
-      margin: 0 auto;
-    }
+  .section {
+    max-width: 1160px;
+    margin: 34px auto;
+    padding: 0 20px;
+  }
 
-    .badge {
-      display: inline-block;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.16);
-      color: #e2e8f0;
-      font-size: 14px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(8px);
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 24px;
+  }
+
+  .card,
+  .calendar-box,
+  .cgv-box,
+  .container,
+  .footer-box {
+    background: var(--surface);
+    border: 1px solid rgba(226,232,240,0.95);
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+  }
+
+  .card p {
+    margin: 8px 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .highlight {
+    color: var(--danger-text);
+    font-weight: bold;
+  }
+
+  .calendar-box,
+  .cgv-box {
+    padding: 24px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 40px auto;
+    padding: 32px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  h2, h3 {
+    color: var(--text);
+    margin-top: 0;
+  }
+
+  .section-title {
+    font-size: 30px;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-subtitle {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #dbe4ef;
+    border-radius: 14px;
+    background: #fff;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+  }
+
+  .btn-row,
+  .btn-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px 18px;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+  }
+
+  .primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .secondary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .secondary:hover {
+    background: var(--accent-2);
+  }
+
+  .paypal {
+    margin-top: 14px;
+    background: var(--paypal);
+    color: white;
+  }
+
+  .paypal:hover {
+    background: var(--paypal-2);
+  }
+
+  .result,
+  .status,
+  .invoice-box {
+    margin-top: 22px;
+    padding: 20px;
+    background: var(--surface-2);
+    border-radius: 18px;
+    border: 1px solid var(--line);
+  }
+
+  .result {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .invoice-box div {
+    margin: 8px 0;
+    font-size: 16px;
+  }
+
+  .status {
+    white-space: pre-line;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .planning-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .planning-day {
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .available {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid #86efac;
+  }
+
+  .unavailable {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid #fca5a5;
+  }
+
+  .small-note {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 12px;
+  }
+
+  ul.clean {
+    padding-left: 18px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .footer {
+    max-width: 1160px;
+    margin: 34px auto 54px;
+    padding: 0 20px;
+  }
+
+  .footer-box {
+    padding: 20px 22px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 860px) {
+    .grid,
+    .btn-row,
+    .btn-row-2 {
+      grid-template-columns: 1fr;
     }
 
     .hero h1 {
-      margin: 0 0 16px;
-      font-size: 42px;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: 34px;
     }
 
-    .hero p {
-      margin: 10px 0;
-      color: #dbeafe;
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 28px;
-    }
-
-    .hero .cta,
-    .hero .cta-secondary {
-      text-decoration: none;
-      padding: 14px 22px;
-      border-radius: 12px;
-      font-weight: bold;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .hero .cta {
-      background: white;
-      color: var(--primary);
-    }
-
-    .hero .cta-secondary {
-      background: rgba(255,255,255,0.12);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.16);
-    }
-
-    .hero .cta:hover,
-    .hero .cta-secondary:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
-    }
-
-    .section {
-      max-width: 1160px;
-      margin: 34px auto;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      margin: 0 0 10px;
-      font-size: 30px;
-      letter-spacing: -0.02em;
-    }
-
-    .section-subtitle {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 860px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-top: 24px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(226,232,240,0.9);
-      backdrop-filter: blur(8px);
-      padding: 22px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 26px 50px rgba(15, 23, 42, 0.1);
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .card p {
-      margin: 8px 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .highlight {
-      color: var(--danger-text);
-      font-weight: bold;
-    }
-
-    .calendar-box,
-    .cgv-box,
     .container {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(226,232,240,0.95);
-      backdrop-filter: blur(8px);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-    }
-
-    .calendar-box,
-    .cgv-box {
+      margin: 24px 16px;
       padding: 24px;
     }
-
-    .container {
-      max-width: 820px;
-      margin: 40px auto;
-      padding: 28px;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      color: #0f172a;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px 15px;
-      border: 1px solid #dbe4ef;
-      border-radius: 14px;
-      background: #fff;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 110px;
-    }
-
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .btn-row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .secondary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .secondary:hover {
-      background: var(--accent-2);
-    }
-
-    .paypal {
-      background: var(--paypal);
-      color: white;
-    }
-
-    .paypal:hover {
-      background: var(--paypal-2);
-    }
-
-    .result,
-    .status,
-    .invoice-box {
-      margin-top: 20px;
-      padding: 18px;
-      background: var(--surface-2);
-      border-radius: 16px;
-      border: 1px solid var(--line);
-    }
-
-    .result {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .invoice-box div {
-      margin: 8px 0;
-    }
-
-    .status {
-      white-space: pre-line;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .planning-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .planning-day {
-      padding: 16px;
-      border-radius: 14px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.6;
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
-    }
-
-    .available {
-      background: var(--success-bg);
-      color: var(--success-text);
-      border: 1px solid #86efac;
-    }
-
-    .unavailable {
-      background: var(--danger-bg);
-      color: var(--danger-text);
-      border: 1px solid #fca5a5;
-    }
-
-    .small-note {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 12px;
-    }
-
-    ul.clean {
-      padding-left: 18px;
-      line-height: 1.8;
-      color: var(--muted);
-    }
-
-    .footer {
-      max-width: 1160px;
-      margin: 34px auto 54px;
-      padding: 0 20px;
-      color: #475569;
-      font-size: 14px;
-    }
-
-    .footer-box {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(226,232,240,0.9);
-      box-shadow: var(--shadow);
-      border-radius: 20px;
-      padding: 20px 22px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 860px) {
-      .grid,
-      .btn-row,
-      .btn-row-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .hero h1 {
-        font-size: 34px;
-      }
-
-      .section-title {
-        font-size: 26px;
-      }
-
-      .container {
-        margin: 24px 16px;
-        padding: 22px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
@@ -548,12 +449,17 @@
       <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
     </div>
 
-    <div class="btn-row-2">
-      <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
-      <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
-    </div>
+    <div class="btn-row">
+  <button class="primary" onclick="calculer()">Calculer et sauvegarder</button>
+  <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
+</div>
 
-    <button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
+<div class="btn-row-2">
+  <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
+  <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
+</div>
+
+<button class="paypal" onclick="payerPaypal()">Payer avec PayPal</button>
 
     <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
 
