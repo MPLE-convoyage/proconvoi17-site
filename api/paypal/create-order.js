@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
   const tokenData = await tokenRes.json();
   const accessToken = tokenData.access_token;
 
-  const orderRes = await fetch("https://api-m.paypal.com", {
+  const orderRes = await fetch("https://api-m.paypal.com/v2/checkout/orders", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
