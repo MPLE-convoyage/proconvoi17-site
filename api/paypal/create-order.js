@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-  const tokenRes = await fetch("https://api-m.paypal.com", {
+  const tokenRes = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
