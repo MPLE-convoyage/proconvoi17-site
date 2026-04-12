@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Proconvoi17</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .logo {
+      width: 200px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+
+    .cta {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #facc15;
+      color: black;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .cta-secondary {
+      display: inline-block;
+      padding: 12px 20px;
+      background: transparent;
+      border: 1px solid #fff;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .section {
+      background: #f1f5f9;
+      color: #111;
+      padding: 30px;
+      margin: 20px;
+      border-radius: 12px;
+    }
+
+    .planning-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .planning-day {
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .available {
+      background: #16a34a;
+      color: white;
+    }
+
+    .unavailable {
+      background: #dc2626;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+
+    <img 
+      src="logo-proconvoi17.png" 
+      alt="Logo Proconvoi17" 
+      class="logo" 
+      id="siteLogo"
+    />
+
+    <h1 id="siteTitle" style="display:none;">Proconvoi17</h1>
+
+    <p>
+      Convoyage de véhicules VL / PL / SPL<br>
+      Conducteur PL / SPL indépendant<br>
+      Devis rapide, planning, PDF, paiement PayPal
+    </p>
+
+    <a href="#devis" class="cta">Demander un devis</a>
+    <a href="#planning" class="cta-secondary">Voir le planning</a>
+
+  </div>
+<script>
+const supabaseClient = supabase.createClient(
+  "https://znodbkoakkaucxikkway.supabase.co",
+  "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
+);
+
+const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
+const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
+const SUPABASE_ANON_KEY = "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1";
+const NB_JOURS_PLANNING = 45;
+
+let indisponibilites = [];
+let derniereFacture = null;
+
+// ---------------- LOGO ----------------
+
+const siteLogo = document.getElementById("siteLogo");
+const siteTitle = document.getElementById("siteTitle");
+
+if (siteLogo) {
+  siteLogo.addEventListener("load", () => {
+    siteLogo.style.display = "block";
+    if (siteTitle) siteTitle.style.display = "none";
+  });
+
+  siteLogo.addEventListener("error", () => {
+    siteLogo.style.display = "none";
+    if (siteTitle) siteTitle.style.display = "block";
+  });
+}
+
+// ---------------- OUTILS ----------------
+
+function euro(v) {
+  return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+}
+
+function formatDateFr(dateString) {
+  const d = new Date(dateString);
+  return d.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+function buildInvoiceNumber() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const stamp = String(Date.now()).slice(-6);
+  return `FAC-${year}-${stamp}`;
+}
+
+// ---------------- PLANNING ----------------
+
+async function chargerIndisponibilites() {
+  const { data, error } = await supabaseClient
+    .from("unavailable_dates")
+    .select("date")
+    .order("date", { ascending: true });
+
+  if (error) {
+    console.error("Erreur chargement planning :", error);
+    return;
+  }
+
+  indisponibilites = (data || []).map(item => item.date);
+}
+
+function renderPlanning() {
+  const planning = document.getElementById("planningList");
+  if (!planning) return;
+
+  planning.innerHTML = "";
+
+  for (let i = 0; i < NB_JOURS_PLANNING; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+
+    const iso = d.toISOString().split("T")[0];
+    const isUnavailable = indisponibilites.includes(iso);
+
+    const item = document.createElement("div");
+    item.className = "planning-day " + (isUnavailable ? "unavailable" : "available");
+    item.innerHTML = `
+      <div style="font-size:14px;">${formatDateFr(iso)}</div>
+      <div style="margin-top:6px; font-size:13px;">
+        ${isUnavailable ? "❌ Indisponible" : "✅ Disponible"}
+      </div>
+    `;
+    planning.appendChild(item);
+  }
+}
+
+// ---------------- FORMULAIRE ----------------
+
+function changerMode() {
+  const mode = document.getElementById("serviceType")?.value;
+  const blocConvoyage = document.getElementById("blocConvoyage");
+  const blocConducteur = document.getElementById("blocConducteur");
+
+  if (blocConvoyage) blocConvoyage.classList.toggle("hidden", mode !== "convoyage");
+  if (blocConducteur) blocConducteur.classList.toggle("hidden", mode !== "conducteur");
+}
+
+function lireFormulaire() {
+  const serviceType = document.getElementById("serviceType")?.value || "convoyage";
+  const vehicleSelect = document.getElementById("type");
+
+  return {
+    serviceType,
+    clientName: document.getElementById("clientName")?.value.trim() || "",
+    clientEmail: document.getElementById("clientEmail")?.value.trim() || "",
+    clientPhone: document.getElementById("clientPhone")?.value.trim() || "",
+    company: document.getElementById("company")?.value.trim() || "",
+    vehicleText: vehicleSelect?.selectedOptions?.[0]?.text || "",
+    tarif: parseFloat(vehicleSelect?.value || 0) || 0,
+    km: parseFloat(document.getElementById("km")?.value || 0) || 0,
+    jours: parseFloat(document.getElementById("jours")?.value || 0) || 0,
+    decouches: parseFloat(document.getElementById("decouches")?.value || 0) || 0,
+    dateSouhaitee: document.getElementById("dateSouhaitee")?.value || "",
+    message: document.getElementById("message")?.value.trim() || ""
+  };
+}
+
+function calculMontants() {
+  const form = lireFormulaire();
+
+  if (form.serviceType === "conducteur") {
+    const base = form.jours * 320;
+    const frais = form.decouches * 90;
+    const total = base + frais;
+    return { ...form, base, frais, total };
+  }
+
+  let base = form.km * form.tarif;
+  const frais = base * 0.26;
+  let total = base + frais;
+
+  if (total < 90) total = 90;
+
+  return { ...form, base, frais, total };
+}
+
+function majAffichage(result) {
+  const resultat = document.getElementById("resultat");
+  const invoiceNumber = document.getElementById("invoiceNumber");
+  const emailStatus = document.getElementById("emailStatus");
+
+  if (resultat) resultat.innerText = "Montant estimatif : " + euro(result.total);
+  if (invoiceNumber) invoiceNumber.innerText = derniereFacture?.invoice_number || "-";
+  if (emailStatus) emailStatus.innerText = derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
+}
+
+// ---------------- CALCUL + SAUVEGARDE ----------------
+
+async function calculer() {
+  const result = calculMontants();
+  const status = document.getElementById("status");
+
+  if (!result.clientName || !result.clientEmail) {
+    if (status) status.innerText = "Statut : merci de renseigner le nom et l’email.";
+    return;
+  }
+
+  if (result.serviceType === "convoyage" && !result.km) {
+    if (status) status.innerText = "Statut : merci de renseigner la distance.";
+    return;
+  }
+
+  if (result.serviceType === "conducteur" && !result.jours) {
+    if (status) status.innerText = "Statut : merci de renseigner le nombre de jours.";
+    return;
+  }
+
+  if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
+    if (status) status.innerText = "Statut : la date choisie est actuellement indisponible.";
+    return;
+  }
+
+  const payload = {
+    invoice_number: buildInvoiceNumber(),
+    created_at_label: new Date().toLocaleDateString("fr-FR"),
+    service_type: result.serviceType,
+    vehicle_type: result.serviceType === "convoyage" ? result.vehicleText : "Conducteur PL / SPL",
+    distance_km: result.serviceType === "convoyage" ? result.km : null,
+    days: result.serviceType === "conducteur" ? result.jours : null,
+    overnights: result.serviceType === "conducteur" ? result.decouches : null,
+    client_name: result.clientName,
+    company: result.company,
+    client_email: result.clientEmail,
+    client_phone: result.clientPhone,
+    message: result.message,
+    base_amount: result.base,
+    fees_amount: result.frais,
+    total_amount: result.total,
+    email_sent: false,
+    paid: false
+  };
+
+  const { data, error } = await supabaseClient
+    .from("invoices")
+    .insert([payload])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Erreur sauvegarde :", error);
+    if (status) status.innerText = "Statut : erreur de sauvegarde.\n" + error.message;
+    return;
+  }
+
+  derniereFacture = data;
+  majAffichage(result);
+
+  if (status) {
+    status.innerText = "Statut : devis sauvegardé.\nNuméro : " + data.invoice_number;
+  }
+
+  afficherBoutonPaypal();
+}
+
+// ---------------- PDF ----------------
+
+function headerPdf(pdf, titre, numero) {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  let y = 20;
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(20);
+  pdf.text(titre, 20, y);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.text(`N° ${numero || "-"}`, pageWidth - 70, y);
+  y += 10;
+
+  pdf.setFontSize(10);
+  pdf.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
+  y += 10;
+
+  return y;
+}
+
+function buildDocumentBlob(typeDocument) {
+  if (!derniereFacture) return null;
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+
+  let y = headerPdf(pdf, typeDocument, derniereFacture.invoice_number);
+
+  const line = (text, x = 20, jump = 7) => {
+    pdf.text(String(text), x, y);
+    y += jump;
+  };
+
+  const hr = () => {
+    pdf.setDrawColor(180);
+    pdf.line(20, y, pageWidth - 20, y);
+    y += 8;
+  };
+
+  const companyLines = [
+    "Proconvoi17",
+    "Auto-entrepreneur",
+    "SIRET : 532 293 461 00044",
+    "Téléphone : 0763082637",
+    "Email : mickaelple066@gmail.com"
+  ];
+
+  const clientLines = [
+    `Nom : ${derniereFacture.client_name || "-"}`,
+    `Société : ${derniereFacture.company || "-"}`,
+    `Téléphone : ${derniereFacture.client_phone || "-"}`,
+    `Email : ${derniereFacture.client_email || "-"}`
+  ];
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("PRESTATAIRE", 20, y);
+  pdf.text("CLIENT", 110, y);
+  y += 8;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  companyLines.forEach(l => line(l, 20, 6));
+  const yClient = y - companyLines.length * 6;
+
+  clientLines.forEach((l, i) => {
+    pdf.text(String(l), 110, yClient + (i * 6));
+  });
+
+  y += 8;
+  hr();
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
+  line(`DÉTAIL DU ${typeDocument}`, 20, 9);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+
+  if (derniereFacture.service_type === "conducteur") {
+    line("Type : Conducteur PL / SPL");
+    line(`Nombre de jours : ${derniereFacture.days || 0}`);
+    line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
+    line(`Base mission : ${euro(derniereFacture.base_amount)}`);
+    line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
+  } else {
+    line(`Type : ${derniereFacture.vehicle_type || "-"}`);
+    line(`Distance : ${derniereFacture.distance_km || 0} km`);
+    line(`Base transport : ${euro(derniereFacture.base_amount)}`);
+    line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
+    if ((derniereFacture.total_amount || 0) === 90) {
+      line(`Minimum de facturation appliqué : 90,00 €`);
+    }
+  }
+
+  const dateChoisie = document.getElementById("dateSouhaitee")?.value;
+  if (dateChoisie) {
+    line(`Date souhaitée : ${formatDateFr(dateChoisie)}`);
+  }
+
+  if (derniereFacture.message) {
+    y += 2;
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Informations complémentaires :", 20, y);
+    y += 7;
+    pdf.setFont("helvetica", "normal");
+    const split = pdf.splitTextToSize(derniereFacture.message, 170);
+    pdf.text(split, 20, y);
+    y += split.length * 6 + 4;
+  }
+
+  hr();
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.text(typeDocument === "DEVIS" ? "TOTAL ESTIMATIF" : "TOTAL À PAYER", 20, y);
+
+  pdf.setFontSize(16);
+  pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
+
+  return pdf.output("blob");
+}
+
+async function telechargerDevis() {
+  if (!derniereFacture) {
+    document.getElementById("status").innerText = "Statut : calcule d’abord le devis.";
+    return;
+  }
+
+  const blob = buildDocumentBlob("DEVIS");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `devis-${derniereFacture.invoice_number}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function telechargerFacture() {
+  if (!derniereFacture) {
+    document.getElementById("status").innerText = "Statut : calcule d’abord le devis.";
+    return;
+  }
+
+  const blob = buildDocumentBlob("FACTURE");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `facture-${derniereFacture.invoice_number}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---------------- EMAIL ----------------
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = String(reader.result || "");
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function envoyerFacture() {
+  if (!derniereFacture) {
+    document.getElementById("status").innerText =
+      "Statut : calcule d’abord le devis avant l’envoi.";
+    return;
+  }
+
+  try {
+    const pdfBlob = buildDocumentBlob("FACTURE");
+    const pdfBase64 = await blobToBase64(pdfBlob);
+
+    const response = await fetch(EMAIL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY
+      },
+      body: JSON.stringify({
+        to: derniereFacture.client_email,
+        subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
+        text:
+          "Bonjour " + derniereFacture.client_name + ",\n\n" +
+          "Veuillez trouver votre facture " + derniereFacture.invoice_number +
+          " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
+          "Cordialement,\nProconvoi17",
+        filename: derniereFacture.invoice_number + ".pdf",
+        pdfBase64
+      })
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status + " - " + responseText);
+    }
+
+    await supabaseClient
+      .from("invoices")
+      .update({ email_sent: true })
+      .eq("id", derniereFacture.id);
+
+    derniereFacture.email_sent = true;
+    document.getElementById("emailStatus").innerText = "Envoyé";
+    document.getElementById("status").innerText =
+      "Statut : facture envoyée par email à " + derniereFacture.client_email;
+  } catch (err) {
+    console.error("Erreur email:", err);
+    document.getElementById("status").innerText =
+      "Statut : erreur d’envoi email.\n" + err.message;
+  }
+}
+
+// ---------------- PAYPAL ----------------
+
+async function creerCommandePaypal() {
+  const result = calculMontants();
+
+  if (!derniereFacture?.id) {
+    document.getElementById("status").innerText =
+      "Statut : fais d'abord le devis avant de payer.";
+    throw new Error("Facture manquante");
+  }
+
+  const res = await fetch(PAYPAL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "apikey": SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({
+      action: "create",
+      amount: result.total.toFixed(2),
+      invoice_id: derniereFacture.id,
+      invoice_number: derniereFacture.invoice_number
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.id) {
+    throw new Error(data.error || "Erreur PayPal");
+  }
+
+  return data.id;
+}
+
+async function capturerCommandePaypal(orderID) {
+  const res = await fetch(PAYPAL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "apikey": SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({
+      action: "capture",
+      orderID,
+      invoice_id: derniereFacture?.id
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Erreur paiement");
+  }
+
+  const dateChoisie = document.getElementById("dateSouhaitee")?.value;
+  const nomClient = document.getElementById("clientName")?.value || "";
+
+  if (dateChoisie) {
+    const { error } = await supabaseClient
+      .from("unavailable_dates")
+      .upsert(
+        [{
+          date: dateChoisie,
+          client_name: nomClient
+        }],
+        { onConflict: "date" }
+      );
+
+    if (error) {
+      console.error("Erreur blocage planning :", error);
+    } else {
+      if (!indisponibilites.includes(dateChoisie)) {
+        indisponibilites.push(dateChoisie);
+      }
+      renderPlanning();
+    }
+  }
+
+  if (derniereFacture?.id) {
+    await supabaseClient
+      .from("invoices")
+      .update({ paid: true })
+      .eq("id", derniereFacture.id);
+  }
+
+  return data;
+}
+
+function afficherBoutonPaypal() {
+  const container = document.getElementById("paypal-button-container");
+  if (!window.paypal || !container) return;
+
+  container.innerHTML = "";
+
+  paypal.Buttons({
+    style: {
+      layout: "vertical",
+      color: "gold",
+      shape: "pill",
+      label: "paypal"
+    },
+
+    createOrder: async () => {
+      document.getElementById("status").innerText =
+        "Statut : redirection vers PayPal...";
+      return await creerCommandePaypal();
+    },
+
+    onApprove: async (data) => {
+      document.getElementById("status").innerText =
+        "Statut : validation du paiement...";
+
+      await capturerCommandePaypal(data.orderID);
+
+      document.getElementById("status").innerText =
+        "Statut : paiement validé ✅ et date bloquée dans le planning";
+    },
+
+    onCancel: () => {
+      document.getElementById("status").innerText =
+        "Statut : paiement annulé.";
+    },
+
+    onError: (err) => {
+      console.error(err);
+      document.getElementById("status").innerText =
+        "Statut : erreur paiement.";
+    }
+  }).render("#paypal-button-container");
+}
+
+// ---------------- INIT ----------------
+
+async function initApp() {
+  try {
+    await chargerIndisponibilites();
+    renderPlanning();
+  } catch (err) {
+    console.error("Erreur planning :", err);
+  }
+
+  try {
+    afficherBoutonPaypal();
+  } catch (err) {
+    console.error("Erreur PayPal :", err);
+  }
+}
+
+initApp();
+</script>
