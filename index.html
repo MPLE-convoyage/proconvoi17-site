@@ -414,7 +414,56 @@
     toggleFields();
   </script>
   <div id="paypal-button-container"></div>
+function renderPaypalButtons() {
+  document.getElementById("paypal-button-container").innerHTML = "";
 
+  paypal.Buttons({
+    createOrder: async function () {
+      const res = await fetch("/api/paypal/create-order", {
+        method: "POST"
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur création commande");
+      }
+
+      return data.id;
+    },
+
+    onApprove: async function (data) {
+      const res = await fetch("/api/paypal/capture-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          orderID: data.orderID
+        })
+      });
+
+      const captureData = await res.json();
+
+      if (!res.ok) {
+        document.getElementById("paypal-message").textContent =
+          captureData.error || "Erreur capture paiement";
+        return;
+      }
+
+      document.getElementById("statutPaiement").textContent = "payé";
+      document.getElementById("statutPaiement").className = "success";
+      document.getElementById("paypal-message").textContent =
+        "Paiement PayPal réussi ✅";
+    },
+
+    onError: function (err) {
+      console.error(err);
+      document.getElementById("paypal-message").textContent =
+        "Erreur PayPal ❌";
+    }
+  }).render("#paypal-button-container");
+}
 <script>
 paypal.Buttons({
   createOrder: async function() {
