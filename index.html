@@ -750,27 +750,28 @@ async function capturerCommandePaypal(orderID) {
   }
 
   const dateChoisie = document.getElementById("dateSouhaitee")?.value;
+  const nomClient = document.getElementById("clientName")?.value || "";
 
   if (dateChoisie) {
-  const { error } = await supabaseClient
-    .from("unavailable_dates")
-    .upsert(
-      [{
-        date: dateChoisie,
-        client_name: document.getElementById("clientName")?.value || ""
-      }],
-      { onConflict: "date" }
-    );
+    const { error } = await supabaseClient
+      .from("unavailable_dates")
+      .upsert(
+        [{
+          date: dateChoisie,
+          client_name: nomClient
+        }],
+        { onConflict: "date" }
+      );
 
-  if (error) {
-    console.error("Erreur blocage planning :", error);
-  } else {
-    if (!indisponibilites.includes(dateChoisie)) {
-      indisponibilites.push(dateChoisie);
+    if (error) {
+      console.error("Erreur blocage planning :", error);
+    } else {
+      if (!indisponibilites.includes(dateChoisie)) {
+        indisponibilites.push(dateChoisie);
+      }
+      renderPlanning();
     }
-    renderPlanning();
   }
-}
 
   if (derniereFacture?.id) {
     await supabaseClient
