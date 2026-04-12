@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset ="UTF-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
   <style>
@@ -236,7 +236,7 @@
     </section>
   </main>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID_PAYPAL&currency=EUR&intent=capture"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AZdTmUpz1l4ZT1UsyCUe7lM_yi5e3Udmsl72xbymyH505xTsi7jI8jXyBOHfiyVW241mjBwBW451qanK&currency=EUR"></script>
 
   <script>
     const prestation = document.getElementById("prestation");
@@ -413,5 +413,29 @@
     prestation.addEventListener("change", toggleFields);
     toggleFields();
   </script>
+  <div id="paypal-button-container"></div>
+
+<script>
+paypal.Buttons({
+  createOrder: async function() {
+    const res = await fetch('/api/paypal/create-order', {
+      method: 'POST'
+    });
+    const data = await res.json();
+    return data.id;
+  },
+
+  onApprove: async function(data) {
+    await fetch('/api/paypal/capture-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderID: data.orderID })
+    });
+
+    alert("Paiement réussi !");
+  }
+
+}).render('#paypal-button-container');
+</script>
 </body>
 </html>
