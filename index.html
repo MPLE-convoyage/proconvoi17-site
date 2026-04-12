@@ -752,19 +752,25 @@ async function capturerCommandePaypal(orderID) {
   const dateChoisie = document.getElementById("dateSouhaitee")?.value;
 
   if (dateChoisie) {
-    const { error } = await supabaseClient
-      .from("unavailable_dates")
-      .upsert([{ date: dateChoisie }], { onConflict: "date" });
+  const { error } = await supabaseClient
+    .from("unavailable_dates")
+    .upsert(
+      [{
+        date: dateChoisie,
+        client_name: document.getElementById("clientName")?.value || ""
+      }],
+      { onConflict: "date" }
+    );
 
-    if (error) {
-      console.error("Erreur blocage planning :", error);
-    } else {
-      if (!indisponibilites.includes(dateChoisie)) {
-        indisponibilites.push(dateChoisie);
-      }
-      renderPlanning();
+  if (error) {
+    console.error("Erreur blocage planning :", error);
+  } else {
+    if (!indisponibilites.includes(dateChoisie)) {
+      indisponibilites.push(dateChoisie);
     }
+    renderPlanning();
   }
+}
 
   if (derniereFacture?.id) {
     await supabaseClient
