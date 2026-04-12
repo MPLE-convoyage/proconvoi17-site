@@ -27,12 +27,14 @@ export default async function handler(req, res) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      intent: "CAPTURE",
-      purchase_units: [{
-        amount: {
-          currency_code: "EUR",
-          value: "100.00"
-        }
+  intent: "CAPTURE",
+  purchase_units: [{
+    amount: {
+      currency_code: "EUR",
+      value: amount
+    }
+  }]
+})
       }]
     })
   });
