@@ -4,1144 +4,414 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Proconvoi17</title>
-
   <style>
-    :root {
-      --surface: rgba(255,255,255,0.94);
-      --surface-2: #f8fafc;
-      --text: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --primary: #0f172a;
-      --accent: #2563eb;
-      --accent-2: #1d4ed8;
-      --success-bg: #dcfce7;
-      --success-text: #166534;
-      --danger-bg: #fee2e2;
-      --danger-text: #991b1b;
-      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-      --radius: 22px;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(37,99,235,0.10), transparent 35%),
-        linear-gradient(180deg, #eef3f9 0%, #f8fbff 100%);
-      color: var(--text);
-    }
-
-    .hero {
-      background: radial-gradient(circle at top, #1e293b, #020617);
-      color: white;
-      padding: 80px 20px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(255,215,0,0.08), transparent 45%);
-      pointer-events: none;
-    }
-
-    .hero-inner {
-      max-width: 980px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .logo-wrap {
-      min-height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 18px;
-    }
-
-    .logo {
-      width: min(280px, 75vw);
-      height: auto;
-      display: none;
-      margin: 0 auto;
-      filter: drop-shadow(0 25px 50px rgba(0,0,0,0.4));
-      transition: transform 0.3s ease;
-    }
-
-    .logo:hover {
-      transform: scale(1.04);
-    }
-
-    .hero h1 {
-      margin: 0 0 14px;
-      font-size: 42px;
-      letter-spacing: -0.02em;
-    }
-
-    .hero p {
-      margin: 8px 0;
-      color: #dbeafe;
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 24px;
-    }
-
-    .hero .cta,
-    .hero .cta-secondary {
-      display: inline-block;
-      text-decoration: none;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-weight: bold;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .hero .cta {
-      background: white;
-      color: var(--primary);
-    }
-
-    .hero .cta-secondary {
-      background: rgba(255,255,255,0.12);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .hero .cta:hover,
-    .hero .cta-secondary:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .section {
-      max-width: 1160px;
-      margin: 34px auto;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      font-size: 30px;
-      margin: 0 0 10px;
-      letter-spacing: -0.02em;
-    }
-
-    .section-subtitle {
       margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 860px;
+      padding: 0;
+      background: #f5f5f5;
+      color: #222;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-top: 24px;
+    header {
+      background: #111827;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
     }
 
-    .card,
-    .calendar-box,
-    .cgv-box,
-    .container,
-    .footer-box {
-      background: var(--surface);
-      border: 1px solid rgba(226,232,240,0.95);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      backdrop-filter: blur(8px);
+    main {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
     }
 
-    .card {
-      padding: 22px;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 24px 46px rgba(15,23,42,0.12);
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .card p {
-      margin: 8px 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .highlight {
-      color: var(--danger-text);
-      font-weight: bold;
-    }
-
-    .calendar-box,
-    .cgv-box {
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 860px;
-      margin: 40px auto;
-      padding: 32px;
+    h1, h2, h3 {
+      margin-top: 0;
     }
 
     .grid {
       display: grid;
-      gap: 16px;
       grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
     }
 
     label {
       display: block;
-      margin-top: 18px;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
-    input, select, textarea {
+    input, select, textarea, button {
       width: 100%;
-      padding: 14px 15px;
-      border: 1px solid #dbe4ef;
-      border-radius: 14px;
-      background: #fff;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
     }
 
     textarea {
+      min-height: 100px;
       resize: vertical;
-      min-height: 110px;
-    }
-
-    .btn-row,
-    .btn-row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 16px;
     }
 
     button {
-      width: 100%;
-      padding: 15px 18px;
+      background: #111827;
+      color: white;
       border: none;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 700;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      font-weight: bold;
     }
 
     button:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
+      background: #1f2937;
     }
 
-    .primary { background: var(--primary); color: white; }
-    .secondary { background: var(--accent); color: white; }
-    .secondary:hover { background: var(--accent-2); }
-
-    #paypal-button-container {
-      margin-top: 16px;
-      padding: 14px;
-      background: linear-gradient(180deg, #ffffff, #f8fafc);
-      border: 1px solid var(--line);
-      border-radius: 18px;
+    .btn-secondary {
+      background: #374151;
     }
 
-    .result,
-    .status,
-    .invoice-box {
-      margin-top: 22px;
-      padding: 20px;
-      background: var(--surface-2);
-      border-radius: 18px;
-      border: 1px solid var(--line);
+    .btn-secondary:hover {
+      background: #4b5563;
     }
 
-    .result {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+    .status-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
     }
 
-    .invoice-box div {
-      margin: 8px 0;
-      font-size: 16px;
-    }
-
-    .status {
-      white-space: pre-line;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .planning-list {
+    .row-actions {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-      max-height: 520px;
-      overflow: auto;
-      padding-right: 4px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
     }
 
-    .planning-day {
-      padding: 16px;
-      border-radius: 16px;
+    .hidden {
+      display: none;
+    }
+
+    .success {
+      color: green;
       font-weight: bold;
-      text-align: center;
-      line-height: 1.6;
-      transition: all 0.2s ease;
     }
 
-    .planning-day:hover {
-      transform: scale(1.03);
+    .pending {
+      color: #b45309;
+      font-weight: bold;
     }
 
-    .available {
-      background: var(--success-bg);
-      color: var(--success-text);
-      border: 1px solid #86efac;
+    .error {
+      color: red;
+      font-weight: bold;
     }
 
-    .unavailable {
-      background: var(--danger-bg);
-      color: var(--danger-text);
-      border: 1px solid #fca5a5;
-    }
-
-    .small-note {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 12px;
-    }
-
-    ul.clean {
-      padding-left: 18px;
-      line-height: 1.8;
-      color: var(--muted);
-    }
-
-    .footer {
-      max-width: 1160px;
-      margin: 34px auto 54px;
-      padding: 0 20px;
-    }
-
-    .footer-box {
-      padding: 20px 22px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .hidden { display: none; }
-
-    @media (max-width: 860px) {
-      .grid,
-      .btn-row,
-      .btn-row-2 {
+    @media (max-width: 700px) {
+      .grid, .row-actions {
         grid-template-columns: 1fr;
-      }
-
-      .hero h1 {
-        font-size: 34px;
-      }
-
-      .container {
-        margin: 24px 16px;
-        padding: 24px;
       }
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Proconvoi17</h1>
+    <p>Convoyage de véhicules VL / PL / SPL – Conducteur PL / SPL indépendant</p>
+  </header>
 
-  <div class="hero">
-    <div class="hero-inner">
-      <div class="logo-wrap">
-        <img src="logo-proconvoi17.png" alt="Logo Proconvoi17" class="logo" id="siteLogo" />
+  <main>
+    <section>
+      <h2>Présentation</h2>
+      <p>Devis rapide, facture PDF, paiement PayPal et envoi par email.</p>
+
+      <h3>Convoyage VL</h3>
+      <p>0,98 €/km + 26% de frais de route – minimum 90 €</p>
+
+      <h3>Convoyage PL / SPL</h3>
+      <p>2,20 €/km + 26% de frais de route – minimum 90 €</p>
+
+      <h3>Conducteur PL / SPL</h3>
+      <p>320 €/jour + 90 € / découché</p>
+    </section>
+
+    <section>
+      <h2>Demande de devis</h2>
+
+      <form id="quoteForm" class="grid">
+        <div>
+          <label for="nom">Nom du client</label>
+          <input type="text" id="nom" required />
+        </div>
+
+        <div>
+          <label for="email">Email du client</label>
+          <input type="email" id="email" required />
+        </div>
+
+        <div>
+          <label for="telephone">Téléphone</label>
+          <input type="text" id="telephone" />
+        </div>
+
+        <div>
+          <label for="societe">Société</label>
+          <input type="text" id="societe" />
+        </div>
+
+        <div>
+          <label for="prestation">Type de prestation</label>
+          <select id="prestation">
+            <option value="convoyage">Convoyage</option>
+            <option value="conducteur">Conducteur PL / SPL</option>
+          </select>
+        </div>
+
+        <div id="vehiculeBloc">
+          <label for="vehicule">Type de véhicule</label>
+          <select id="vehicule">
+            <option value="vl">VL - 0,98 €/km</option>
+            <option value="pl">PL / SPL - 2,20 €/km</option>
+          </select>
+        </div>
+
+        <div id="distanceBloc">
+          <label for="distance">Distance en kilomètres</label>
+          <input type="number" id="distance" min="0" step="1" value="0" />
+        </div>
+
+        <div id="joursBloc" class="hidden">
+          <label for="jours">Nombre de jours</label>
+          <input type="number" id="jours" min="0" step="1" value="1" />
+        </div>
+
+        <div id="decouchesBloc" class="hidden">
+          <label for="decouches">Nombre de découchés</label>
+          <input type="number" id="decouches" min="0" step="1" value="0" />
+        </div>
+
+        <div>
+          <label for="dateSouhaitee">Date souhaitée</label>
+          <input type="date" id="dateSouhaitee" />
+        </div>
+
+        <div class="full">
+          <label for="infos">Informations complémentaires</label>
+          <textarea id="infos"></textarea>
+        </div>
+
+        <div class="full row-actions">
+          <button type="button" id="calculerBtn">Calculer et sauvegarder</button>
+          <button type="button" class="btn-secondary" id="pdfBtn">Télécharger la facture PDF</button>
+        </div>
+      </form>
+
+      <div class="status-box">
+        <p><strong>Montant estimatif :</strong> <span id="montant">0.00</span> €</p>
+        <p><strong>Numéro :</strong> <span id="numeroFacture">-</span></p>
+        <p><strong>Statut email :</strong> <span id="statutEmail">Non envoyé</span></p>
+        <p><strong>Statut :</strong> <span id="statutPaiement" class="pending">en attente</span></p>
       </div>
 
-      <h1 id="siteTitle" style="display:none;">Proconvoi17</h1>
-
-      <p>Convoyage de véhicules VL / PL / SPL</p>
-      <p>Conducteur PL / SPL indépendant</p>
-      <p>Devis rapide, planning, PDF, paiement PayPal et envoi par email.</p>
-
-      <div class="hero-actions">
-        <a href="#devis" class="cta">Demander un devis</a>
-        <a href="#planning" class="cta-secondary">Voir le planning</a>
+      <div id="paypal-section" class="hidden" style="margin-top: 20px;">
+        <h3>Payer avec PayPal</h3>
+        <div id="paypal-button-container"></div>
+        <p id="paypal-message"></p>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <div class="section">
-    <h2 class="section-title">Présentation</h2>
-    <p class="section-subtitle">
-      Proconvoi17 vous accompagne pour le convoyage de véhicules légers, poids lourds et super poids lourds,
-      ainsi que pour les missions de conducteur PL / SPL indépendant. Le site permet de calculer rapidement
-      un devis, d’éditer un devis PDF, une facture PDF, d’envoyer la facture par email et de proposer un paiement PayPal.
-    </p>
-
-    <div class="cards">
-      <div class="card">
-        <h3>Convoyage VL</h3>
-        <p>Tarif : <strong>0,98 € / km</strong></p>
-        <p>+ <strong>26%</strong> de frais de route</p>
-        <p class="highlight">Minimum de facturation : 90 €</p>
-      </div>
-
-      <div class="card">
-        <h3>Convoyage PL / SPL</h3>
-        <p>Tarif : <strong>2,20 € / km</strong></p>
-        <p>+ <strong>26%</strong> de frais de route</p>
-        <p class="highlight">Minimum de facturation : 90 €</p>
-      </div>
-
-      <div class="card">
-        <h3>Conducteur PL / SPL</h3>
-        <p>Tarif journalier : <strong>320 € / jour</strong></p>
-        <p>Découché : <strong>90 €</strong></p>
-      </div>
-
-      <div class="card">
-        <h3>Pourquoi nous choisir</h3>
-        <p>Réactivité, professionnalisme, devis rapide, paiement simple et suivi administratif.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" id="planning">
-    <div class="calendar-box">
-      <h2 class="section-title" style="font-size:26px; margin-bottom:8px;">Planning de disponibilité</h2>
-      <p class="section-subtitle">Consultez rapidement les 45 prochains jours disponibles et indisponibles.</p>
-      <h3 style="margin:18px 0 8px;">Disponibilités sur 45 jours</h3>
-      <p class="small-note">Planning mis à jour en temps réel.</p>
-      <div id="planningList" class="planning-list"></div>
-      <div class="small-note">
-        Les jours en vert sont disponibles. Les jours en rouge sont indisponibles.
-      </div>
-    </div>
-  </div>
-
-  <div class="container" id="devis">
-    <h2 class="section-title" style="font-size:28px; margin-bottom:8px;">Demande de devis</h2>
-    <p class="section-subtitle" style="margin-bottom:16px;">
-      Remplissez le formulaire pour obtenir une estimation rapide et générer vos documents.
-    </p>
-
-    <div class="grid">
-      <div>
-        <label for="clientName">Nom du client</label>
-        <input id="clientName" type="text" placeholder="Ex: Jean Dupont" />
-      </div>
-      <div>
-        <label for="clientEmail">Email du client</label>
-        <input id="clientEmail" type="email" placeholder="client@email.com" />
-      </div>
-      <div>
-        <label for="clientPhone">Téléphone</label>
-        <input id="clientPhone" type="text" placeholder="Ex: 0612345678" />
-      </div>
-      <div>
-        <label for="company">Société</label>
-        <input id="company" type="text" placeholder="Ex: Transports Martin" />
-      </div>
-    </div>
-
-    <label for="serviceType">Type de prestation</label>
-    <select id="serviceType" onchange="changerMode()">
-      <option value="convoyage">Convoyage</option>
-      <option value="conducteur">Conducteur PL / SPL</option>
-    </select>
-
-    <div id="blocConvoyage">
-      <label for="type">Type de véhicule</label>
-      <select id="type">
-        <option value="0.98">VL - 0,98 €/km</option>
-        <option value="2.2">PL / SPL - 2,20 €/km</option>
-      </select>
-
-      <label for="km">Distance en kilomètres</label>
-      <input id="km" type="number" placeholder="Ex: 150" />
-    </div>
-
-    <div id="blocConducteur" class="hidden">
-      <label for="jours">Nombre de jours</label>
-      <input id="jours" type="number" placeholder="Ex: 2" min="0" />
-
-      <label for="decouches">Nombre de découchés</label>
-      <input id="decouches" type="number" placeholder="Ex: 1" min="0" />
-    </div>
-
-    <label for="dateSouhaitee">Date souhaitée</label>
-    <input id="dateSouhaitee" type="date" />
-
-    <label for="message">Informations complémentaires</label>
-    <textarea id="message" rows="3" placeholder="Informations utiles..."></textarea>
-
-    <div class="btn-row">
-      <button class="primary" onclick="calculer()">Calculer et sauvegarder</button>
-      <button class="secondary" onclick="telechargerDevis()">Télécharger le devis PDF</button>
-    </div>
-
-    <div class="btn-row-2">
-      <button class="secondary" onclick="telechargerFacture()">Télécharger la facture PDF</button>
-      <button class="secondary" onclick="envoyerFacture()">Envoyer la facture par email</button>
-    </div>
-
-    <div id="paypal-button-container"></div>
-
-    <div class="result" id="resultat">Montant estimatif : 0,00 €</div>
-
-    <div class="invoice-box">
-      <div><strong>Numéro :</strong> <span id="invoiceNumber">-</span></div>
-      <div><strong>Statut email :</strong> <span id="emailStatus">Non envoyé</span></div>
-    </div>
-
-    <div class="status" id="status">Statut : en attente</div>
-  </div>
-
-  <div class="section">
-    <div class="cgv-box">
-      <h2 class="section-title" style="font-size:26px; margin-bottom:8px;">Conditions Générales de Vente</h2>
-      <ul class="clean">
-        <li>Les prestations proposées concernent le convoyage VL, PL, SPL ainsi que les missions de conducteur PL / SPL indépendant.</li>
-        <li>Les tarifs affichés sont donnés à titre indicatif selon les éléments fournis par le client.</li>
-        <li>Un minimum de facturation de 90 € est appliqué pour toute prestation de convoyage, quelle que soit la distance.</li>
-        <li>Pour le convoyage, les frais de route s’ajoutent au tarif kilométrique à hauteur de 26%.</li>
-        <li>Pour les missions conducteur PL / SPL, le tarif est de 320 € par jour et 90 € par découché.</li>
-        <li>Le paiement peut être demandé avant ou à l’issue de la prestation selon accord préalable.</li>
-        <li>Le client doit fournir des informations exactes pour l’établissement du devis et de la facture.</li>
-        <li>En cas d’annulation tardive, des frais peuvent être appliqués selon l’avancement de l’organisation.</li>
-        <li>Le prestataire ne pourra être tenu responsable d’un retard ou empêchement lié à un cas de force majeure, panne, accident ou événement extérieur.</li>
-        <li>TVA non applicable, article 293 B du CGI.</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="footer">
-    <div class="footer-box">
-      <p><strong>Proconvoi17</strong> – Auto-entrepreneur</p>
-      <p>SIRET : 532 293 461 00044</p>
-      <p>Email : mickaelple066@gmail.com</p>
-      <p>Téléphone : 0763082637</p>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID_PAYPAL&currency=EUR&intent=capture"></script>
 
   <script>
-    const supabaseClient = supabase.createClient(
-      "https://znodbkoakkaucxikkway.supabase.co",
-      "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
-    );
+    const prestation = document.getElementById("prestation");
+    const vehiculeBloc = document.getElementById("vehiculeBloc");
+    const distanceBloc = document.getElementById("distanceBloc");
+    const joursBloc = document.getElementById("joursBloc");
+    const decouchesBloc = document.getElementById("decouchesBloc");
 
-    const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
-    const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
-    const SUPABASE_ANON_KEY = "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1";
-    const NB_JOURS_PLANNING = 45;
+    const calculerBtn = document.getElementById("calculerBtn");
+    const pdfBtn = document.getElementById("pdfBtn");
 
-    let indisponibilites = [];
-    let derniereFacture = null;
+    const montantEl = document.getElementById("montant");
+    const numeroFactureEl = document.getElementById("numeroFacture");
+    const statutEmailEl = document.getElementById("statutEmail");
+    const statutPaiementEl = document.getElementById("statutPaiement");
+    const paypalSection = document.getElementById("paypal-section");
+    const paypalMessage = document.getElementById("paypal-message");
 
-    const siteLogo = document.getElementById("siteLogo");
-    const siteTitle = document.getElementById("siteTitle");
+    let montantGlobal = 0;
+    let numeroFactureGlobal = "";
+    let paypalRendered = false;
 
-    if (siteLogo) {
-      siteLogo.addEventListener("load", () => {
-        siteLogo.style.display = "block";
-        if (siteTitle) siteTitle.style.display = "none";
-      });
-
-      siteLogo.addEventListener("error", () => {
-        siteLogo.style.display = "none";
-        if (siteTitle) siteTitle.style.display = "block";
-      });
+    function genererNumeroFacture() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const h = String(now.getHours()).padStart(2, "0");
+      const min = String(now.getMinutes()).padStart(2, "0");
+      return `FAC-${y}${m}${d}-${h}${min}`;
     }
 
-    function euro(v) {
-      return Number(v || 0).toFixed(2).replace(".", ",") + " €";
-    }
-
-    function formatDateFr(dateString) {
-      const d = new Date(dateString);
-      return d.toLocaleDateString("fr-FR", {
-        weekday: "long",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      });
-    }
-
-    function buildInvoiceNumber() {
-      const d = new Date();
-      const year = d.getFullYear();
-      const stamp = String(Date.now()).slice(-6);
-      return `FAC-${year}-${stamp}`;
-    }
-
-    async function chargerIndisponibilites() {
-      const { data, error } = await supabaseClient
-        .from("unavailable_dates")
-        .select("date")
-        .order("date", { ascending: true });
-
-      if (error) {
-        console.error("Erreur chargement planning :", error);
-        return;
-      }
-
-      indisponibilites = (data || []).map(item => item.date);
-    }
-
-    function renderPlanning() {
-      const planning = document.getElementById("planningList");
-      if (!planning) return;
-
-      planning.innerHTML = "";
-
-      for (let i = 0; i < NB_JOURS_PLANNING; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-
-        const iso = d.toISOString().split("T")[0];
-        const isUnavailable = indisponibilites.includes(iso);
-
-        const item = document.createElement("div");
-        item.className = "planning-day " + (isUnavailable ? "unavailable" : "available");
-        item.innerHTML = `
-          <div style="font-size:14px;">${formatDateFr(iso)}</div>
-          <div style="margin-top:6px; font-size:13px;">
-            ${isUnavailable ? "❌ Indisponible" : "✅ Disponible"}
-          </div>
-        `;
-        planning.appendChild(item);
-      }
-    }
-
-    function changerMode() {
-      const mode = document.getElementById("serviceType")?.value;
-      const blocConvoyage = document.getElementById("blocConvoyage");
-      const blocConducteur = document.getElementById("blocConducteur");
-
-      if (blocConvoyage) blocConvoyage.classList.toggle("hidden", mode !== "convoyage");
-      if (blocConducteur) blocConducteur.classList.toggle("hidden", mode !== "conducteur");
-    }
-
-    function lireFormulaire() {
-      const serviceType = document.getElementById("serviceType")?.value || "convoyage";
-      const vehicleSelect = document.getElementById("type");
-
-      return {
-        serviceType,
-        clientName: document.getElementById("clientName")?.value.trim() || "",
-        clientEmail: document.getElementById("clientEmail")?.value.trim() || "",
-        clientPhone: document.getElementById("clientPhone")?.value.trim() || "",
-        company: document.getElementById("company")?.value.trim() || "",
-        vehicleText: vehicleSelect?.selectedOptions?.[0]?.text || "",
-        tarif: parseFloat(vehicleSelect?.value || 0) || 0,
-        km: parseFloat(document.getElementById("km")?.value || 0) || 0,
-        jours: parseFloat(document.getElementById("jours")?.value || 0) || 0,
-        decouches: parseFloat(document.getElementById("decouches")?.value || 0) || 0,
-        dateSouhaitee: document.getElementById("dateSouhaitee")?.value || "",
-        message: document.getElementById("message")?.value.trim() || ""
-      };
-    }
-
-    function calculMontants() {
-      const form = lireFormulaire();
-
-      if (form.serviceType === "conducteur") {
-        const base = form.jours * 320;
-        const frais = form.decouches * 90;
-        const total = base + frais;
-        return { ...form, base, frais, total };
-      }
-
-      let base = form.km * form.tarif;
-      const frais = base * 0.26;
-      let total = base + frais;
-
-      if (total < 90) total = 90;
-
-      return { ...form, base, frais, total };
-    }
-
-    function majAffichage(result) {
-      const resultat = document.getElementById("resultat");
-      const invoiceNumber = document.getElementById("invoiceNumber");
-      const emailStatus = document.getElementById("emailStatus");
-
-      if (resultat) resultat.innerText = "Montant estimatif : " + euro(result.total);
-      if (invoiceNumber) invoiceNumber.innerText = derniereFacture?.invoice_number || "-";
-      if (emailStatus) emailStatus.innerText = derniereFacture?.email_sent ? "Envoyé" : "Non envoyé";
-    }
-
-    async function calculer() {
-      const result = calculMontants();
-      const status = document.getElementById("status");
-
-      if (!result.clientName || !result.clientEmail) {
-        if (status) status.innerText = "Statut : merci de renseigner le nom et l’email.";
-        return;
-      }
-
-      if (result.serviceType === "convoyage" && !result.km) {
-        if (status) status.innerText = "Statut : merci de renseigner la distance.";
-        return;
-      }
-
-      if (result.serviceType === "conducteur" && !result.jours) {
-        if (status) status.innerText = "Statut : merci de renseigner le nombre de jours.";
-        return;
-      }
-
-      if (result.dateSouhaitee && indisponibilites.includes(result.dateSouhaitee)) {
-        if (status) status.innerText = "Statut : la date choisie est actuellement indisponible.";
-        return;
-      }
-
-      const payload = {
-        invoice_number: buildInvoiceNumber(),
-        created_at_label: new Date().toLocaleDateString("fr-FR"),
-        service_type: result.serviceType,
-        vehicle_type: result.serviceType === "convoyage" ? result.vehicleText : "Conducteur PL / SPL",
-        distance_km: result.serviceType === "convoyage" ? result.km : null,
-        days: result.serviceType === "conducteur" ? result.jours : null,
-        overnights: result.serviceType === "conducteur" ? result.decouches : null,
-        client_name: result.clientName,
-        company: result.company,
-        client_email: result.clientEmail,
-        client_phone: result.clientPhone,
-        message: result.message,
-        base_amount: result.base,
-        fees_amount: result.frais,
-        total_amount: result.total,
-        email_sent: false,
-        paid: false
-      };
-
-      const { data, error } = await supabaseClient
-        .from("invoices")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Erreur sauvegarde :", error);
-        if (status) status.innerText = "Statut : erreur de sauvegarde.\n" + error.message;
-        return;
-      }
-
-      derniereFacture = data;
-      majAffichage(result);
-
-      if (status) {
-        status.innerText = "Statut : devis sauvegardé.\nNuméro : " + data.invoice_number;
-      }
-
-      afficherBoutonPaypal();
-    }
-
-    function headerPdf(pdf, titre, numero) {
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      let y = 20;
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(20);
-      pdf.text(titre, 20, y);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      pdf.text(`N° ${numero || "-"}`, pageWidth - 70, y);
-      y += 10;
-
-      pdf.setFontSize(10);
-      pdf.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, pageWidth - 70, y);
-      y += 10;
-
-      return y;
-    }
-
-    function buildDocumentBlob(typeDocument) {
-      if (!derniereFacture) return null;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-
-      let y = headerPdf(pdf, typeDocument, derniereFacture.invoice_number);
-
-      const line = (text, x = 20, jump = 7) => {
-        pdf.text(String(text), x, y);
-        y += jump;
-      };
-
-      const hr = () => {
-        pdf.setDrawColor(180);
-        pdf.line(20, y, pageWidth - 20, y);
-        y += 8;
-      };
-
-      const companyLines = [
-        "Proconvoi17",
-        "Auto-entrepreneur",
-        "SIRET : 532 293 461 00044",
-        "Téléphone : 0763082637",
-        "Email : mickaelple066@gmail.com"
-      ];
-
-      const clientLines = [
-        `Nom : ${derniereFacture.client_name || "-"}`,
-        `Société : ${derniereFacture.company || "-"}`,
-        `Téléphone : ${derniereFacture.client_phone || "-"}`,
-        `Email : ${derniereFacture.client_email || "-"}`
-      ];
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(11);
-      pdf.text("PRESTATAIRE", 20, y);
-      pdf.text("CLIENT", 110, y);
-      y += 8;
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
-
-      companyLines.forEach(l => line(l, 20, 6));
-      const yClient = y - companyLines.length * 6;
-
-      clientLines.forEach((l, i) => {
-        pdf.text(String(l), 110, yClient + (i * 6));
-      });
-
-      y += 8;
-      hr();
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(12);
-      line(`DÉTAIL DU ${typeDocument}`, 20, 9);
-
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
-
-      if (derniereFacture.service_type === "conducteur") {
-        line("Type : Conducteur PL / SPL");
-        line(`Nombre de jours : ${derniereFacture.days || 0}`);
-        line(`Nombre de découchés : ${derniereFacture.overnights || 0}`);
-        line(`Base mission : ${euro(derniereFacture.base_amount)}`);
-        line(`Frais découchés : ${euro(derniereFacture.fees_amount)}`);
+    function toggleFields() {
+      if (prestation.value === "convoyage") {
+        vehiculeBloc.classList.remove("hidden");
+        distanceBloc.classList.remove("hidden");
+        joursBloc.classList.add("hidden");
+        decouchesBloc.classList.add("hidden");
       } else {
-        line(`Type : ${derniereFacture.vehicle_type || "-"}`);
-        line(`Distance : ${derniereFacture.distance_km || 0} km`);
-        line(`Base transport : ${euro(derniereFacture.base_amount)}`);
-        line(`Frais de route : ${euro(derniereFacture.fees_amount)}`);
-        if ((derniereFacture.total_amount || 0) === 90) {
-          line(`Minimum de facturation appliqué : 90,00 €`);
-        }
-      }
-
-      const dateChoisie = document.getElementById("dateSouhaitee")?.value;
-      if (dateChoisie) {
-        line(`Date souhaitée : ${formatDateFr(dateChoisie)}`);
-      }
-
-      if (derniereFacture.message) {
-        y += 2;
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Informations complémentaires :", 20, y);
-        y += 7;
-        pdf.setFont("helvetica", "normal");
-        const split = pdf.splitTextToSize(derniereFacture.message, 170);
-        pdf.text(split, 20, y);
-        y += split.length * 6 + 4;
-      }
-
-      hr();
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      pdf.text(typeDocument === "DEVIS" ? "TOTAL ESTIMATIF" : "TOTAL À PAYER", 20, y);
-
-      pdf.setFontSize(16);
-      pdf.text(euro(derniereFacture.total_amount), pageWidth - 60, y);
-
-      return pdf.output("blob");
-    }
-
-    async function telechargerDevis() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText = "Statut : calcule d’abord le devis.";
-        return;
-      }
-
-      const blob = buildDocumentBlob("DEVIS");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `devis-${derniereFacture.invoice_number}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    async function telechargerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText = "Statut : calcule d’abord le devis.";
-        return;
-      }
-
-      const blob = buildDocumentBlob("FACTURE");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `facture-${derniereFacture.invoice_number}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = String(reader.result || "");
-          resolve(result.split(",")[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function envoyerFacture() {
-      if (!derniereFacture) {
-        document.getElementById("status").innerText =
-          "Statut : calcule d’abord le devis avant l’envoi.";
-        return;
-      }
-
-      try {
-        const pdfBlob = buildDocumentBlob("FACTURE");
-        const pdfBase64 = await blobToBase64(pdfBlob);
-
-        const response = await fetch(EMAIL_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": "Bearer " + SUPABASE_ANON_KEY
-          },
-          body: JSON.stringify({
-            to: derniereFacture.client_email,
-            subject: "Facture " + derniereFacture.invoice_number + " - Proconvoi17",
-            text:
-              "Bonjour " + derniereFacture.client_name + ",\n\n" +
-              "Veuillez trouver votre facture " + derniereFacture.invoice_number +
-              " d'un montant de " + euro(derniereFacture.total_amount) + ".\n\n" +
-              "Cordialement,\nProconvoi17",
-            filename: derniereFacture.invoice_number + ".pdf",
-            pdfBase64
-          })
-        });
-
-        const responseText = await response.text();
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " - " + responseText);
-        }
-
-        await supabaseClient
-          .from("invoices")
-          .update({ email_sent: true })
-          .eq("id", derniereFacture.id);
-
-        derniereFacture.email_sent = true;
-        document.getElementById("emailStatus").innerText = "Envoyé";
-        document.getElementById("status").innerText =
-          "Statut : facture envoyée par email à " + derniereFacture.client_email;
-      } catch (err) {
-        console.error("Erreur email:", err);
-        document.getElementById("status").innerText =
-          "Statut : erreur d’envoi email.\n" + err.message;
+        vehiculeBloc.classList.add("hidden");
+        distanceBloc.classList.add("hidden");
+        joursBloc.classList.remove("hidden");
+        decouchesBloc.classList.remove("hidden");
       }
     }
 
-    async function creerCommandePaypal() {
-      const result = calculMontants();
+    function calculerMontant() {
+      let montant = 0;
 
-      if (!derniereFacture?.id) {
-        document.getElementById("status").innerText =
-          "Statut : fais d'abord le devis avant de payer.";
-        throw new Error("Facture manquante");
+      if (prestation.value === "convoyage") {
+        const distance = parseFloat(document.getElementById("distance").value) || 0;
+        const vehicule = document.getElementById("vehicule").value;
+
+        let tarifKm = vehicule === "vl" ? 0.98 : 2.20;
+        montant = distance * tarifKm;
+        montant += montant * 0.26;
+
+        if (montant < 90) montant = 90;
+      } else {
+        const jours = parseFloat(document.getElementById("jours").value) || 0;
+        const decouches = parseFloat(document.getElementById("decouches").value) || 0;
+
+        montant = (jours * 320) + (decouches * 90);
       }
 
-      const res = await fetch(PAYPAL_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-          action: "create",
-          amount: result.total.toFixed(2),
-          invoice_id: derniereFacture.id,
-          invoice_number: derniereFacture.invoice_number
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.id) {
-        throw new Error(data.error || "Erreur PayPal");
-      }
-
-      return data.id;
+      return montant;
     }
 
-    async function capturerCommandePaypal(orderID) {
-      const res = await fetch(PAYPAL_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-          action: "capture",
-          orderID,
-          invoice_id: derniereFacture?.id
-        })
-      });
+    function renderPaypalButtons() {
+      if (paypalRendered) return;
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Erreur paiement");
-      }
-
-      const dateChoisie = document.getElementById("dateSouhaitee")?.value;
-      const nomClient = document.getElementById("clientName")?.value || "";
-
-      if (dateChoisie) {
-        const { error } = await supabaseClient
-          .from("unavailable_dates")
-          .upsert(
-            [{
-              date: dateChoisie,
-              client_name: nomClient
-            }],
-            { onConflict: "date" }
-          );
-
-        if (error) {
-          console.error("Erreur blocage planning :", error);
-        } else {
-          if (!indisponibilites.includes(dateChoisie)) {
-            indisponibilites.push(dateChoisie);
-          }
-          renderPlanning();
-        }
-      }
-
-      if (derniereFacture?.id) {
-        await supabaseClient
-          .from("invoices")
-          .update({ paid: true })
-          .eq("id", derniereFacture.id);
-      }
-
-      return data;
-    }
-
-    function afficherBoutonPaypal() {
-      const container = document.getElementById("paypal-button-container");
-      if (!window.paypal || !container) return;
-
-      container.innerHTML = "";
+      paypalRendered = true;
 
       paypal.Buttons({
-        style: {
-          layout: "vertical",
-          color: "gold",
-          shape: "pill",
-          label: "paypal"
+        createOrder: async function() {
+          const response = await fetch("/api/paypal/create-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              amount: montantGlobal.toFixed(2),
+              invoiceNumber: numeroFactureGlobal,
+              customerName: document.getElementById("nom").value || "Client"
+            })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Erreur création commande PayPal");
+          }
+
+          return data.id;
         },
 
-        createOrder: async () => {
-          document.getElementById("status").innerText =
-            "Statut : redirection vers PayPal...";
-          return await creerCommandePaypal();
+        onApprove: async function(data) {
+          const response = await fetch("/api/paypal/capture-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              orderID: data.orderID,
+              invoiceNumber: numeroFactureGlobal
+            })
+          });
+
+          const captureData = await response.json();
+
+          if (!response.ok) {
+            paypalMessage.textContent = captureData.error || "Erreur capture paiement";
+            paypalMessage.className = "error";
+            return;
+          }
+
+          statutPaiementEl.textContent = "payé";
+          statutPaiementEl.className = "success";
+          paypalMessage.textContent = "Paiement PayPal validé avec succès.";
+          paypalMessage.className = "success";
         },
 
-        onApprove: async (data) => {
-          document.getElementById("status").innerText =
-            "Statut : validation du paiement...";
-
-          await capturerCommandePaypal(data.orderID);
-
-          document.getElementById("status").innerText =
-            "Statut : paiement validé ✅ et date bloquée dans le planning";
-        },
-
-        onCancel: () => {
-          document.getElementById("status").innerText =
-            "Statut : paiement annulé.";
-        },
-
-        onError: (err) => {
+        onError: function(err) {
           console.error(err);
-          document.getElementById("status").innerText =
-            "Statut : erreur paiement.";
+          paypalMessage.textContent = "Erreur PayPal. Vérifie la configuration.";
+          paypalMessage.className = "error";
         }
       }).render("#paypal-button-container");
     }
 
-    async function initApp() {
-      try {
-        await chargerIndisponibilites();
-        renderPlanning();
-      } catch (err) {
-        console.error("Erreur planning :", err);
+    calculerBtn.addEventListener("click", () => {
+      const nom = document.getElementById("nom").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!nom || !email) {
+        alert("Merci de remplir au minimum le nom et l'email.");
+        return;
       }
 
-      try {
-        afficherBoutonPaypal();
-      } catch (err) {
-        console.error("Erreur PayPal :", err);
-      }
-    }
+      montantGlobal = calculerMontant();
+      numeroFactureGlobal = genererNumeroFacture();
 
-    initApp();
+      montantEl.textContent = montantGlobal.toFixed(2);
+      numeroFactureEl.textContent = numeroFactureGlobal;
+      statutEmailEl.textContent = "Non envoyé";
+      statutPaiementEl.textContent = "en attente";
+      statutPaiementEl.className = "pending";
+
+      localStorage.setItem("proconvoi17_facture", JSON.stringify({
+        nom,
+        email,
+        telephone: document.getElementById("telephone").value,
+        societe: document.getElementById("societe").value,
+        prestation: prestation.value,
+        vehicule: document.getElementById("vehicule").value,
+        distance: document.getElementById("distance").value,
+        jours: document.getElementById("jours").value,
+        decouches: document.getElementById("decouches").value,
+        dateSouhaitee: document.getElementById("dateSouhaitee").value,
+        infos: document.getElementById("infos").value,
+        montant: montantGlobal.toFixed(2),
+        numeroFacture: numeroFactureGlobal,
+        statutPaiement: "en attente"
+      }));
+
+      paypalSection.classList.remove("hidden");
+      renderPaypalButtons();
+    });
+
+    pdfBtn.addEventListener("click", () => {
+      window.print();
+    });
+
+    prestation.addEventListener("change", toggleFields);
+    toggleFields();
   </script>
 </body>
 </html>
