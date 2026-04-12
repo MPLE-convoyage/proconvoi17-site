@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-  const tokenRes = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token", {
+  const tokenRes = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   const tokenData = await tokenRes.json();
   const accessToken = tokenData.access_token;
 
-  const captureRes = await fetch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderID}/capture`, {
+  https://api-m.paypal.com/v2/checkout/orders
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
