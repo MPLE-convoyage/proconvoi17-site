@@ -565,18 +565,89 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR"></script>
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR"></script>
 
+<script>
 const supabaseClient = supabase.createClient(
   "https://znodbkoakkaucxikkway.supabase.co",
   "sb_publishable_Fl-F_uNkzXRUea86wbkabw_0WseZXJ1"
 );
 
+const EMAIL_ENDPOINT = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/send-invoice-email";
 const PAYPAL_URL = "https://znodbkoakkaucxikkway.supabase.co/functions/v1/paypal-checkout";
+const NB_JOURS_PLANNING = 45;
 
+let indisponibilites = [];
 let derniereFacture = null;
 
-// ---------------- CALCUL ----------------
+const siteLogo = document.getElementById("siteLogo");
+const siteTitle = document.getElementById("siteTitle");
+
+if (siteLogo) {
+  siteLogo.addEventListener("load", () => {
+    siteLogo.style.display = "block";
+    if (siteTitle) siteTitle.style.display = "none";
+  });
+
+  siteLogo.addEventListener("error", () => {
+    siteLogo.style.display = "none";
+    if (siteTitle) siteTitle.style.display = "block";
+  });
+}
+
+function euro(v) {
+  return Number(v || 0).toFixed(2).replace(".", ",") + " €";
+}
+
+function formatDateFr(dateString) {
+  const d = new Date(dateString);
+  return d.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+async function chargerIndisponibilites() {
+  const { data, error } = await supabaseClient
+    .from("unavailable_dates")
+    .select("date")
+    .order("date", { ascending: true });
+
+  if (error) {
+    console.error("Erreur chargement planning :", error);
+    return;
+  }
+
+  indisponibilites = (data || []).map(item => item.date);
+}
+
+function renderPlanning() {
+  const planning = document.getElementById("planningList");
+  if (!planning) return;
+
+  planning.innerHTML = "";
+
+  for (let i = 0; i < NB_JOURS_PLANNING; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const iso = d.toISOString().split("T")[0];
+    const isUnavailable = indisponibilites.includes(iso);
+
+    const item = document.createElement("div");
+    item.className = "planning-day " + (isUnavailable ? "unavailable" : "available");
+    item.innerHTML = `
+      <div style="font-size:14px;">${formatDateFr(iso)}</div>
+      <div style="margin-top:6px; font-size:13px;">
+        ${isUnavailable ? "❌ Indisponible" : "✅ Disponible"}
+      </div>
+    `;
+    planning.appendChild(item);
+  }
+}
 
 function calculMontants() {
   const km = parseFloat(document.getElementById("km")?.value || 0);
@@ -591,16 +662,14 @@ function calculMontants() {
   return { base, frais, total };
 }
 
-// ---------------- CALCUL + SAVE ----------------
-
 async function calculer() {
-
   const result = calculMontants();
 
   const payload = {
     invoice_number: "FAC-" + Date.now(),
     total_amount: result.total,
-    email_sent: false
+    email_sent: false,
+    paid: false
   };
 
   const { data, error } = await supabaseClient
@@ -610,26 +679,34 @@ async function calculer() {
     .single();
 
   if (error) {
+    console.error(error);
     alert("Erreur sauvegarde");
     return;
   }
 
   derniereFacture = data;
 
-  document.getElementById("resultat").innerText =
-    "Montant estimatif : " + result.total.toFixed(2) + " €";
+  const resultat = document.getElementById("resultat");
+  const status = document.getElementById("status");
+  const invoiceNumber = document.getElementById("invoiceNumber");
+  const emailStatus = document.getElementById("emailStatus");
 
-  document.getElementById("status").innerText =
-    "Devis sauvegardé";
+  if (resultat) resultat.innerText = "Montant estimatif : " + euro(result.total);
+  if (status) status.innerText = "Statut : devis sauvegardé.\nNuméro : " + data.invoice_number;
+  if (invoiceNumber) invoiceNumber.innerText = data.invoice_number;
+  if (emailStatus) emailStatus.innerText = "Non envoyé";
 
   afficherBoutonPaypal();
 }
 
-// ---------------- PAYPAL ----------------
-
 async function creerCommandePaypal() {
-
   const result = calculMontants();
+
+  if (!derniereFacture?.id) {
+    document.getElementById("status").innerText =
+      "Statut : fais d'abord le devis avant de payer.";
+    throw new Error("Facture manquante");
+  }
 
   const res = await fetch(PAYPAL_URL, {
     method: "POST",
@@ -637,11 +714,16 @@ async function creerCommandePaypal() {
     body: JSON.stringify({
       action: "create",
       amount: result.total.toFixed(2),
-      invoice_id: derniereFacture?.id
+      invoice_id: derniereFacture.id
     })
   });
 
   const data = await res.json();
+
+  if (!res.ok || !data.id) {
+    throw new Error(data.error || "Erreur PayPal");
+  }
+
   return data.id;
 }
 
@@ -690,8 +772,6 @@ async function capturerCommandePaypal(orderID) {
 
   return data;
 }
-  });
-}
 
 function afficherBoutonPaypal() {
   const container = document.getElementById("paypal-button-container");
@@ -708,33 +788,9 @@ function afficherBoutonPaypal() {
     },
 
     createOrder: async () => {
-      if (!derniereFacture?.id) {
-        document.getElementById("status").innerText =
-          "Statut : fais d'abord le devis avant de payer.";
-        throw new Error("Facture manquante");
-      }
-
-      const result = calculMontants();
-
-      const res = await fetch(PAYPAL_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "create",
-          amount: result.total.toFixed(2),
-          invoice_id: derniereFacture.id
-        })
-      });
-
-      const data = await res.json();
-
-      if (!data.id) {
-        throw new Error("Erreur PayPal");
-      }
-
       document.getElementById("status").innerText =
         "Statut : redirection vers PayPal...";
-      return data.id;
+      return await creerCommandePaypal();
     },
 
     onApprove: async (data) => {
@@ -757,13 +813,25 @@ function afficherBoutonPaypal() {
       document.getElementById("status").innerText =
         "Statut : erreur paiement.";
     }
-
   }).render("#paypal-button-container");
 }
 
-  }).render('#paypal-button-container');
+async function initApp() {
+  try {
+    await chargerIndisponibilites();
+    renderPlanning();
+  } catch (err) {
+    console.error("Erreur planning :", err);
+  }
+
+  try {
+    afficherBoutonPaypal();
+  } catch (err) {
+    console.error("Erreur PayPal :", err);
+  }
 }
 
+initApp();
 </script>
    
 </body>
