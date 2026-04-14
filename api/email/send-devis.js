@@ -29,7 +29,9 @@ module.exports = async (req, res) => {
     const notifyTo = process.env.NOTIFY_TO_EMAIL;
 
     if (!apiKey || !fromEmail || !notifyTo) {
-      return res.status(500).json({ error: "Variables email manquantes dans Vercel" });
+      return res.status(500).json({
+        error: "Variables email manquantes dans Vercel"
+      });
     }
 
     const headers = {
@@ -38,22 +40,31 @@ module.exports = async (req, res) => {
     };
 
     const htmlDevis = `
-      <h2>Devis Proconvoi17</h2>
-      <p><strong>Numéro :</strong> ${numeroFacture}</p>
-      <p><strong>Client :</strong> ${nom}</p>
-      <p><strong>Email :</strong> ${email}</p>
-      <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
-      <p><strong>Société :</strong> ${societe || "-"}</p>
-      <p><strong>Prestation :</strong> ${prestation || "-"}</p>
-      <p><strong>Véhicule :</strong> ${vehicule || "-"}</p>
-      <p><strong>Distance :</strong> ${distance || "-"}</p>
-      <p><strong>Jours :</strong> ${jours || "-"}</p>
-      <p><strong>Découchés :</strong> ${decouches || "-"}</p>
-      <p><strong>Date souhaitée :</strong> ${dateSouhaitee || "-"}</p>
-      <p><strong>Infos :</strong> ${infos || "-"}</p>
-      <p><strong>Montant estimatif :</strong> ${montant} €</p>
-      <hr />
-      <p>Merci pour votre demande.</p>
+      <div style="font-family: Arial, sans-serif; color: #142033; line-height: 1.6;">
+        <h2 style="color: #0b1f3a;">Devis Proconvoi17</h2>
+
+        <p><strong>Numéro :</strong> ${numeroFacture}</p>
+        <p><strong>Client :</strong> ${nom}</p>
+        <p><strong>Email :</strong> ${email}</p>
+        <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
+        <p><strong>Société :</strong> ${societe || "-"}</p>
+        <p><strong>Prestation :</strong> ${prestation || "-"}</p>
+        <p><strong>Véhicule :</strong> ${vehicule || "-"}</p>
+        <p><strong>Distance :</strong> ${distance || "-"}</p>
+        <p><strong>Jours :</strong> ${jours || "-"}</p>
+        <p><strong>Découchés :</strong> ${decouches || "-"}</p>
+        <p><strong>Date souhaitée :</strong> ${dateSouhaitee || "-"}</p>
+        <p><strong>Informations complémentaires :</strong> ${infos || "-"}</p>
+
+        <hr style="margin: 20px 0;" />
+
+        <p style="font-size: 18px;">
+          <strong>Montant estimatif :</strong> ${montant} €
+        </p>
+
+        <p>Merci pour votre demande.</p>
+        <p>Proconvoi17</p>
+      </div>
     `;
 
     const adminRes = await fetch("https://api.resend.com/emails", {
