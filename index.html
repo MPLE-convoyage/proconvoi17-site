@@ -6,13 +6,11 @@
   <title>Proconvoi17 - Convoyage et conducteur PL / SPL</title>
   <meta
     name="description"
-    content="Proconvoi17 - Convoyage VL, PL, SPL et conducteur indépendant. Devis rapide et paiement sécurisé par PayPal."
+    content="Proconvoi17 - Convoyage VL, PL, SPL et conducteur indépendant. Devis rapide, PDF, paiement sécurisé par PayPal."
   />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #eef1f5;
@@ -29,9 +27,7 @@
       --radius: 18px;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -45,9 +41,7 @@
       text-decoration: none;
     }
 
-    a:hover {
-      text-decoration: underline;
-    }
+    a:hover { text-decoration: underline; }
 
     header {
       background: linear-gradient(135deg, #07152f 0%, #0e254b 100%);
@@ -62,7 +56,6 @@
       max-width: 120px;
       width: 100%;
       height: auto;
-      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
     }
 
     header h1 {
@@ -75,7 +68,7 @@
       margin: 0 auto;
       max-width: 760px;
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.92);
     }
 
     .topbar {
@@ -173,9 +166,7 @@
       gap: 14px;
     }
 
-    .full {
-      grid-column: 1 / -1;
-    }
+    .full { grid-column: 1 / -1; }
 
     label {
       display: block;
@@ -222,7 +213,7 @@
       border: none;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     button:hover {
@@ -253,9 +244,7 @@
       font-size: 15px;
     }
 
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
 
     .pending {
       color: var(--warning);
@@ -295,13 +284,22 @@
       padding: 18px;
     }
 
-    .contact-card p {
-      margin-bottom: 10px;
-    }
-
     .small {
       color: var(--muted);
       font-size: 14px;
+    }
+
+    .planning-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .planning-box ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
     }
 
     footer {
@@ -319,26 +317,19 @@
         grid-template-columns: 1fr;
       }
 
-      header h1 {
-        font-size: 28px;
-      }
+      header h1 { font-size: 28px; }
 
-      section {
-        padding: 18px;
-      }
+      section { padding: 18px; }
     }
 
     @media print {
       .topbar,
       #calculerBtn,
-      #pdfBtn,
       #paypal-section {
         display: none !important;
       }
 
-      body {
-        background: white;
-      }
+      body { background: white; }
 
       section {
         box-shadow: none;
@@ -373,12 +364,10 @@
             disposition de conducteur PL / SPL indépendant.
           </p>
           <p>
-            Le site vous permet d’obtenir un devis rapide, d’imprimer votre récapitulatif
-            et d’effectuer votre paiement en ligne via PayPal.
+            Le site vous permet d’obtenir un devis rapide, d’imprimer votre récapitulatif,
+            de recevoir un PDF et d’effectuer votre paiement en ligne via PayPal.
           </p>
-          <p class="small">
-            Service simple, rapide et efficace.
-          </p>
+          <p class="small">Service simple, rapide et efficace.</p>
         </div>
 
         <div class="card-soft">
@@ -386,7 +375,7 @@
           <p>✔ Réactivité</p>
           <p>✔ Tarification claire</p>
           <p>✔ Paiement sécurisé</p>
-          <p>✔ Site simple et rapide à utiliser</p>
+          <p>✔ Devis envoyé automatiquement</p>
         </div>
       </div>
 
@@ -463,15 +452,20 @@
         </div>
 
         <div>
-  <label for="dateSouhaitee">Date souhaitée</label>
-  <input type="date" id="dateSouhaitee" />
-
-  <p id="etatDate" style="font-weight:bold; margin-top:5px;"></p>
-</div>
+          <label for="dateSouhaitee">Date souhaitée</label>
+          <input type="date" id="dateSouhaitee" />
+          <p id="etatDate" style="font-weight:bold; margin-top:8px;"></p>
+        </div>
 
         <div class="full">
           <label for="infos">Informations complémentaires</label>
           <textarea id="infos" placeholder="Informations utiles sur la mission..."></textarea>
+        </div>
+
+        <div class="full planning-box">
+          <strong>Planning</strong>
+          <p class="small">Dates déjà indisponibles :</p>
+          <ul id="listeDatesIndisponibles"></ul>
         </div>
 
         <div class="full row-actions">
@@ -502,15 +496,12 @@
           <p><strong>Entreprise :</strong> Proconvoi17</p>
           <p><strong>Nom :</strong> PLE Mickael</p>
           <p><strong>Téléphone :</strong> 07 63 08 26 37</p>
-          <p>
-            <strong>Email :</strong>
-            <a href="mailto:contact@proconvoi17.fr">contact@proconvoi17.fr</a>
-          </p>
+          <p><strong>Email :</strong> <a href="mailto:contact@proconvoi17.fr">contact@proconvoi17.fr</a></p>
         </div>
 
         <div class="contact-card">
           <p><strong>Adresse :</strong> Saintes</p>
-          <p><strong>SIRET :</strong> 53229346100044</p>
+          <p><strong>SIRET :</strong> 532 293 461 00044</p>
           <p class="small">
             Pour toute demande, devis ou mission, merci d’utiliser le formulaire ci-dessus
             ou de nous contacter directement.
@@ -521,7 +512,6 @@
 
     <section id="cgv">
       <h2>Conditions Générales de Vente (CGV)</h2>
-
       <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage et de conduite réalisées par Proconvoi17.</p>
       <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros et calculés selon les informations fournies lors de la demande de devis.</p>
       <p><strong>3. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
@@ -554,10 +544,72 @@
     const statutPaiementEl = document.getElementById("statutPaiement");
     const paypalSection = document.getElementById("paypal-section");
     const paypalMessage = document.getElementById("paypal-message");
+    const inputDate = document.getElementById("dateSouhaitee");
+    const etatDate = document.getElementById("etatDate");
+    const listeDatesIndisponibles = document.getElementById("listeDatesIndisponibles");
 
     let montantGlobal = 0;
     let numeroFactureGlobal = "";
     let paypalRendered = false;
+
+    const datesIndisponibles = [
+      "2026-04-20",
+      "2026-04-25",
+      "2026-05-01"
+    ];
+
+    function afficherDatesIndisponibles() {
+      listeDatesIndisponibles.innerHTML = "";
+      datesIndisponibles.forEach((date) => {
+        const li = document.createElement("li");
+        li.textContent = date;
+        listeDatesIndisponibles.appendChild(li);
+      });
+    }
+
+    function verifierDate() {
+      const dateChoisie = inputDate.value;
+
+      if (!dateChoisie) {
+        etatDate.textContent = "";
+        return true;
+      }
+
+      if (datesIndisponibles.includes(dateChoisie)) {
+        etatDate.textContent = "❌ Date indisponible";
+        etatDate.style.color = "red";
+        return false;
+      } else {
+        etatDate.textContent = "✅ Date disponible";
+        etatDate.style.color = "green";
+        return true;
+      }
+    }
+
+    function getHistoriqueDevis() {
+      return JSON.parse(localStorage.getItem("proconvoi17_historique") || "[]");
+    }
+
+    function saveHistoriqueDevis(historique) {
+      localStorage.setItem("proconvoi17_historique", JSON.stringify(historique));
+    }
+
+    function ajouterDevisHistorique(devis) {
+      const historique = getHistoriqueDevis();
+      historique.unshift(devis);
+      saveHistoriqueDevis(historique);
+    }
+
+    function majStatutPaiementHistorique(numeroFacture, statut) {
+      const historique = getHistoriqueDevis();
+      const nouveau = historique.map((item) => {
+        if (item.numeroFacture === numeroFacture) {
+          return { ...item, statutPaiement: statut };
+        }
+        return item;
+      });
+      saveHistoriqueDevis(nouveau);
+    }
 
     function genererNumeroFacture() {
       const now = new Date();
@@ -661,12 +713,7 @@
           paypalMessage.textContent = "Paiement PayPal réussi";
           paypalMessage.className = "success";
 
-          const saved = localStorage.getItem("proconvoi17_facture");
-          if (saved) {
-            const facture = JSON.parse(saved);
-            facture.statutPaiement = "payé";
-            localStorage.setItem("proconvoi17_facture", JSON.stringify(facture));
-          }
+          majStatutPaiementHistorique(numeroFactureGlobal, "payé");
         },
 
         onError: function (err) {
@@ -686,6 +733,11 @@
         return;
       }
 
+      if (!verifierDate()) {
+        alert("Cette date est indisponible. Merci d'en choisir une autre.");
+        return;
+      }
+
       montantGlobal = calculerMontant();
       numeroFactureGlobal = genererNumeroFacture();
 
@@ -695,7 +747,7 @@
       statutPaiementEl.textContent = "en attente";
       statutPaiementEl.className = "pending";
 
-      localStorage.setItem("proconvoi17_facture", JSON.stringify({
+      const devis = {
         nom,
         email,
         telephone: document.getElementById("telephone").value,
@@ -709,29 +761,19 @@
         infos: document.getElementById("infos").value,
         montant: montantGlobal.toFixed(2),
         numeroFacture: numeroFactureGlobal,
-        statutPaiement: "en attente"
-      }));
+        statutPaiement: "en attente",
+        dateCreation: new Date().toISOString()
+      };
+
+      localStorage.setItem("proconvoi17_facture", JSON.stringify(devis));
+      ajouterDevisHistorique(devis);
 
       fetch("/api/email/send-devis", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          nom,
-          email,
-          telephone: document.getElementById("telephone").value,
-          societe: document.getElementById("societe").value,
-          prestation: prestation.value,
-          vehicule: document.getElementById("vehicule").value,
-          distance: document.getElementById("distance").value,
-          jours: document.getElementById("jours").value,
-          decouches: document.getElementById("decouches").value,
-          dateSouhaitee: document.getElementById("dateSouhaitee").value,
-          infos: document.getElementById("infos").value,
-          montant: montantGlobal.toFixed(2),
-          numeroFacture: numeroFactureGlobal
-        })
+        body: JSON.stringify(devis)
       })
       .then(async (response) => {
         const data = await response.json().catch(() => ({}));
@@ -765,31 +807,10 @@
     });
 
     prestation.addEventListener("change", toggleFields);
+    inputDate.addEventListener("change", verifierDate);
+
+    afficherDatesIndisponibles();
     toggleFields();
   </script>
-  <script>
-const datesIndisponibles = [
-  "2026-04-20",
-  "2026-04-25",
-  "2026-05-01"
-];
-
-const inputDate = document.getElementById("dateSouhaitee");
-const etat = document.getElementById("etatDate");
-
-if (inputDate) {
-  inputDate.addEventListener("change", () => {
-    const dateChoisie = inputDate.value;
-
-    if (datesIndisponibles.includes(dateChoisie)) {
-      etat.textContent = "❌ Date indisponible";
-      etat.style.color = "red";
-    } else {
-      etat.textContent = "✅ Date disponible";
-      etat.style.color = "green";
-    }
-  });
-}
-</script>
 </body>
 </html>
