@@ -3,63 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Proconvoi17</title>
+  <title>Proconvoi17 - Convoyage et conducteur PL / SPL</title>
+  <meta
+    name="description"
+    content="Proconvoi17 - Convoyage VL, PL, SPL et conducteur indépendant. Devis rapide et paiement sécurisé par PayPal."
+  />
+
   <style>
     * {
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #eef1f5;
+      --card: #ffffff;
+      --text: #142033;
+      --muted: #5b6472;
+      --primary: #0b1f3a;
+      --primary-2: #1d3557;
+      --border: #d9dee7;
+      --success: #198754;
+      --warning: #b26a00;
+      --danger: #c62828;
+      --shadow: 0 8px 24px rgba(8, 25, 53, 0.08);
+      --radius: 18px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background: #efefef;
-      color: #111827;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #eef1f5 0%, #f7f8fa 100%);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--primary-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     header {
-      background: #07152f;
+      background: linear-gradient(135deg, #07152f 0%, #0e254b 100%);
       color: white;
       text-align: center;
-      padding: 28px 20px 34px;
+      padding: 38px 20px 42px;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 16px;
+      max-width: 120px;
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
     }
 
     header h1 {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       font-size: 34px;
+      line-height: 1.1;
     }
 
     header p {
-      margin: 0;
+      margin: 0 auto;
+      max-width: 760px;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-inner {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .topbar a {
       font-size: 14px;
+      font-weight: bold;
     }
 
     main {
-      max-width: 980px;
-      margin: 40px auto;
+      max-width: 1050px;
+      margin: 30px auto 50px;
       padding: 0 16px;
     }
 
     section {
-      background: #f5f5f5;
-      border-radius: 16px;
-      padding: 20px;
+      background: var(--card);
+      border: 1px solid rgba(217, 222, 231, 0.8);
+      border-radius: var(--radius);
+      padding: 24px;
       margin-bottom: 22px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      box-shadow: var(--shadow);
     }
 
     h2 {
-      font-size: 24px;
+      font-size: 26px;
       margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      color: var(--primary);
     }
 
     h3 {
-      margin-bottom: 8px;
       margin-top: 20px;
+      margin-bottom: 8px;
+      color: var(--primary-2);
     }
 
     p {
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card-soft {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .tarif-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tarif-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .tarif-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--primary);
     }
 
     .grid {
@@ -74,9 +179,10 @@
 
     label {
       display: block;
-      font-weight: 700;
+      font-weight: bold;
       margin-bottom: 8px;
       font-size: 14px;
+      color: var(--primary);
     }
 
     input,
@@ -84,14 +190,24 @@
     textarea,
     button {
       width: 100%;
-      border-radius: 10px;
-      border: 1px solid #cfcfcf;
+      border-radius: 12px;
+      border: 1px solid var(--border);
       padding: 12px 14px;
-      font-size: 16px;
+      font-size: 15px;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #87a4d7;
+      box-shadow: 0 0 0 3px rgba(80, 120, 200, 0.12);
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
 
@@ -104,31 +220,37 @@
 
     button {
       border: none;
-      font-weight: 700;
+      font-weight: bold;
       cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.98;
     }
 
     #calculerBtn {
-      background: #07152f;
+      background: var(--primary);
       color: white;
     }
 
     #pdfBtn {
-      background: #3b4960;
+      background: #52627b;
       color: white;
     }
 
     .status-box {
-      background: #f5f5f5;
-      border: 1px solid #d8d8d8;
-      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 18px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     .status-box p {
       margin: 10px 0;
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .hidden {
@@ -136,60 +258,156 @@
     }
 
     .pending {
-      color: #c26b00;
+      color: var(--warning);
       font-weight: bold;
     }
 
     .success {
-      color: green;
+      color: var(--success);
       font-weight: bold;
     }
 
     .error {
-      color: red;
+      color: var(--danger);
       font-weight: bold;
     }
 
     #paypal-section {
       margin-top: 20px;
-      padding-top: 10px;
+      padding-top: 6px;
     }
 
     #paypal-message {
       margin-top: 12px;
-      font-weight: 700;
+      font-weight: bold;
     }
 
-    @media (max-width: 700px) {
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .contact-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .contact-card p {
+      margin-bottom: 10px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 16px 34px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .intro,
       .grid,
-      .row-actions {
+      .row-actions,
+      .contact-grid {
         grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 28px;
+      }
+
+      section {
+        padding: 18px;
+      }
+    }
+
+    @media print {
+      .topbar,
+      #calculerBtn,
+      #pdfBtn,
+      #paypal-section {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      section {
+        box-shadow: none;
+        border: 1px solid #ccc;
       }
     }
   </style>
 </head>
 <body>
   <header>
+    <img src="logo-proconvoi17.png" alt="Logo Proconvoi17" class="logo" />
     <h1>Proconvoi17</h1>
     <p>Convoyage de véhicules VL / PL / SPL – Conducteur PL / SPL indépendant</p>
   </header>
 
+  <nav class="topbar">
+    <div class="topbar-inner">
+      <a href="#presentation">Présentation</a>
+      <a href="#devis">Devis</a>
+      <a href="#coordonnees">Coordonnées</a>
+      <a href="#cgv">CGV</a>
+    </div>
+  </nav>
+
   <main>
-    <section>
-      <h2>Présentation</h2>
-      <p>Devis rapide, facture PDF, paiement PayPal et envoi par email.</p>
+    <section id="presentation">
+      <div class="intro">
+        <div>
+          <h2>Présentation</h2>
+          <p>
+            Proconvoi17 propose des prestations de convoyage de véhicules et de mise à
+            disposition de conducteur PL / SPL indépendant.
+          </p>
+          <p>
+            Le site vous permet d’obtenir un devis rapide, d’imprimer votre récapitulatif
+            et d’effectuer votre paiement en ligne via PayPal.
+          </p>
+          <p class="small">
+            Service simple, rapide et efficace.
+          </p>
+        </div>
 
-      <h3>Convoyage VL</h3>
-      <p>0,98 €/km + 26% de frais de route – minimum 90 €</p>
+        <div class="card-soft">
+          <h3>Pourquoi choisir Proconvoi17 ?</h3>
+          <p>✔ Réactivité</p>
+          <p>✔ Tarification claire</p>
+          <p>✔ Paiement sécurisé</p>
+          <p>✔ Site simple et rapide à utiliser</p>
+        </div>
+      </div>
 
-      <h3>Convoyage PL / SPL</h3>
-      <p>2,20 €/km + 26% de frais de route – minimum 90 €</p>
-
-      <h3>Conducteur PL / SPL</h3>
-      <p>320 €/jour + 90 € / découché</p>
+      <h3>Tarifs</h3>
+      <div class="tarif-list">
+        <div class="tarif-item">
+          <strong>Convoyage VL</strong>
+          0,98 €/km + 26% de frais de route – minimum 90 €
+        </div>
+        <div class="tarif-item">
+          <strong>Convoyage PL / SPL</strong>
+          2,20 €/km + 26% de frais de route – minimum 90 €
+        </div>
+        <div class="tarif-item">
+          <strong>Conducteur PL / SPL</strong>
+          320 €/jour + 90 € / découché
+        </div>
+      </div>
     </section>
 
-    <section>
+    <section id="devis">
       <h2>Demande de devis</h2>
 
       <form id="quoteForm" class="grid">
@@ -251,12 +469,12 @@
 
         <div class="full">
           <label for="infos">Informations complémentaires</label>
-          <textarea id="infos"></textarea>
+          <textarea id="infos" placeholder="Informations utiles sur la mission..."></textarea>
         </div>
 
         <div class="full row-actions">
           <button type="button" id="calculerBtn">Calculer et sauvegarder</button>
-          <button type="button" id="pdfBtn">Télécharger la facture PDF</button>
+          <button type="button" id="pdfBtn">Télécharger le devis PDF</button>
         </div>
       </form>
 
@@ -272,36 +490,51 @@
         <div id="paypal-button-container"></div>
         <p id="paypal-message"></p>
       </div>
-      <section>
-  <h2>Coordonnées</h2>
+    </section>
 
-  <p><strong>Entreprise :</strong> Proconvoi17</p>
-  <p><strong>Nom :</strong> PLE Mickael</p>
-  <p><strong>Téléphone :</strong> 0763082637</p>
-  <p><strong>Email :</strong> mickaelple066@gmail.com</p>
-  <p><strong>Adresse :</strong> SAINTES</p>
-  <p><strong>SIRET :</strong>532 293 461 00044</p>
+    <section id="coordonnees">
+      <h2>Coordonnées</h2>
 
-        <section>
-  <h2>Conditions Générales de Vente (CGV)</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <p><strong>Entreprise :</strong> Proconvoi17</p>
+          <p><strong>Nom :</strong> PLE Mickael</p>
+          <p><strong>Téléphone :</strong> 07 63 08 26 37</p>
+          <p>
+            <strong>Email :</strong>
+            <a href="mailto:contact@proconvoi17.fr">contact@proconvoi17.fr</a>
+          </p>
+        </div>
 
-  <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage et de conduite réalisées par Proconvoi17.</p>
+        <div class="contact-card">
+          <p><strong>Adresse :</strong> Ta ville / ton adresse</p>
+          <p><strong>SIRET :</strong> 532 293 461 00044</p>
+          <p class="small">
+            Pour toute demande, devis ou mission, merci d’utiliser le formulaire ci-dessus
+            ou de nous contacter directement.
+          </p>
+        </div>
+      </div>
+    </section>
 
-  <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros et calculés selon les informations fournies lors de la demande de devis.</p>
+    <section id="cgv">
+      <h2>Conditions Générales de Vente (CGV)</h2>
 
-  <p><strong>3. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
-
-  <p><strong>4. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
-
-  <p><strong>5. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
-
-  <p><strong>6. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
-
-  <p><strong>7. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
-</section>
+      <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage et de conduite réalisées par Proconvoi17.</p>
+      <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros et calculés selon les informations fournies lors de la demande de devis.</p>
+      <p><strong>3. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
+      <p><strong>4. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
+      <p><strong>5. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
+      <p><strong>6. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
+      <p><strong>7. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
+    </section>
   </main>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR&intent=capture"></script>
+  <footer>
+    © Proconvoi17 - Tous droits réservés
+  </footer>
+
+  <script src="https://www.paypal.com/sdk/js?AX12Yj7WXdgWv-NdDleM21GRoZbs_NcLsboksq-FFkfPYLIruV66s9LFnf1cWFNoFbH1VlUZLqeXU3R_&currency=EUR&intent=capture"></script>
 
   <script>
     const prestation = document.getElementById("prestation");
@@ -354,8 +587,8 @@
       if (prestation.value === "convoyage") {
         const distance = parseFloat(document.getElementById("distance").value) || 0;
         const vehicule = document.getElementById("vehicule").value;
-
         const tarifKm = vehicule === "vl" ? 0.98 : 2.20;
+
         montant = distance * tarifKm;
         montant += montant * 0.26;
 
@@ -363,7 +596,6 @@
       } else {
         const jours = parseFloat(document.getElementById("jours").value) || 0;
         const decouches = parseFloat(document.getElementById("decouches").value) || 0;
-
         montant = (jours * 320) + (decouches * 90);
       }
 
@@ -396,7 +628,7 @@
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.error || "Erreur création commande");
+            throw new Error((data.error || "Erreur création commande") + " " + JSON.stringify(data.details || {}));
           }
 
           return data.id;
@@ -417,8 +649,7 @@
           const captureData = await res.json();
 
           if (!res.ok) {
-            paypalMessage.textContent =
-              captureData.error || "Erreur capture paiement";
+            paypalMessage.textContent = captureData.error || "Erreur capture paiement";
             paypalMessage.className = "error";
             return;
           }
@@ -437,8 +668,8 @@
         },
 
         onError: function (err) {
-          console.error(err);
-          paypalMessage.textContent = "Erreur PayPal";
+          console.error("PayPal error:", err);
+          paypalMessage.textContent = "Erreur PayPal : " + (err.message || JSON.stringify(err));
           paypalMessage.className = "error";
         }
       }).render("#paypal-button-container");
@@ -458,7 +689,7 @@
 
       montantEl.textContent = montantGlobal.toFixed(2);
       numeroFactureEl.textContent = numeroFactureGlobal;
-      statutEmailEl.textContent = "Non envoyé";
+      statutEmailEl.textContent = "Envoi du devis...";
       statutPaiementEl.textContent = "en attente";
       statutPaiementEl.className = "pending";
 
@@ -478,6 +709,43 @@
         numeroFacture: numeroFactureGlobal,
         statutPaiement: "en attente"
       }));
+
+      fetch("/api/email/send-devis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nom,
+          email,
+          telephone: document.getElementById("telephone").value,
+          societe: document.getElementById("societe").value,
+          prestation: prestation.value,
+          vehicule: document.getElementById("vehicule").value,
+          distance: document.getElementById("distance").value,
+          jours: document.getElementById("jours").value,
+          decouches: document.getElementById("decouches").value,
+          dateSouhaitee: document.getElementById("dateSouhaitee").value,
+          infos: document.getElementById("infos").value,
+          montant: montantGlobal.toFixed(2),
+          numeroFacture: numeroFactureGlobal
+        })
+      })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          console.error("Erreur envoi devis :", data);
+          statutEmailEl.textContent = "Erreur d'envoi";
+          return;
+        }
+
+        statutEmailEl.textContent = "Envoyé";
+      })
+      .catch((err) => {
+        console.error("Erreur envoi devis :", err);
+        statutEmailEl.textContent = "Erreur d'envoi";
+      });
 
       paypalMessage.textContent = "";
       paypalMessage.className = "";
