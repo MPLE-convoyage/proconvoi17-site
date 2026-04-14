@@ -463,9 +463,11 @@
         </div>
 
         <div>
-          <label for="dateSouhaitee">Date souhaitée</label>
-          <input type="date" id="dateSouhaitee" />
-        </div>
+  <label for="dateSouhaitee">Date souhaitée</label>
+  <input type="date" id="dateSouhaitee" />
+
+  <p id="etatDate" style="font-weight:bold; margin-top:5px;"></p>
+</div>
 
         <div class="full">
           <label for="infos">Informations complémentaires</label>
@@ -765,5 +767,29 @@
     prestation.addEventListener("change", toggleFields);
     toggleFields();
   </script>
+  <script>
+const datesIndisponibles = [
+  "2026-04-20",
+  "2026-04-25",
+  "2026-05-01"
+];
+
+const inputDate = document.getElementById("dateSouhaitee");
+const etat = document.getElementById("etatDate");
+
+if (inputDate) {
+  inputDate.addEventListener("change", () => {
+    const dateChoisie = inputDate.value;
+
+    if (datesIndisponibles.includes(dateChoisie)) {
+      etat.textContent = "❌ Date indisponible";
+      etat.style.color = "red";
+    } else {
+      etat.textContent = "✅ Date disponible";
+      etat.style.color = "green";
+    }
+  });
+}
+</script>
 </body>
 </html>
