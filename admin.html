@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Proconvoi17</title>
 
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .paid {
+      color: green;
+      font-weight: bold;
+    }
+
+    .pending {
+      color: orange;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📋 Admin Proconvoi17</h1>
+
+<div id="liste"></div>
+
+<script>
+  function afficher() {
+    const container = document.getElementById("liste");
+    container.innerHTML = "";
+
+    const data = JSON.parse(localStorage.getItem("proconvoi17_facture"));
+
+    if (!data) {
+      container.innerHTML = "<p>Aucun devis enregistré</p>";
+      return;
+    }
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <p><strong>Numéro :</strong> ${data.numeroFacture}</p>
+      <p><strong>Nom :</strong> ${data.nom}</p>
+      <p><strong>Email :</strong> ${data.email}</p>
+      <p><strong>Montant :</strong> ${data.montant} €</p>
+      <p><strong>Statut :</strong> 
+        <span class="${data.statutPaiement === "payé" ? "paid" : "pending"}">
+          ${data.statutPaiement}
+        </span>
+      </p>
+
+      <button onclick="supprimer()">Supprimer</button>
+    `;
+
+    container.appendChild(div);
+  }
+
+  function supprimer() {
+    if (confirm("Supprimer ce devis ?")) {
+      localStorage.removeItem("proconvoi17_facture");
+      afficher();
+    }
+  }
+
+  afficher();
+</script>
+
+</body>
+</html>
