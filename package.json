@@ -1,0 +1,8 @@
+{
+  "name": "proconvoi17-site",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "pdfkit": "^0.15.0"
+  }
+}
