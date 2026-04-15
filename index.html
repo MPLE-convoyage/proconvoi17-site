@@ -552,11 +552,9 @@
     let numeroFactureGlobal = "";
     let paypalRendered = false;
 
-    const datesIndisponibles = [
-      "2026-04-20",
-      "2026-04-25",
-      "2026-05-01"
-    ];
+    const datesIndisponibles = JSON.parse(
+  localStorage.getItem("proconvoi17_dates_indisponibles") || "[]"
+);
 
     function afficherDatesIndisponibles() {
       listeDatesIndisponibles.innerHTML = "";
