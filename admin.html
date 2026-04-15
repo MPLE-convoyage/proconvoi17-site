@@ -6,9 +6,7 @@
   <title>Admin - Proconvoi17</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -32,9 +30,15 @@
       flex-wrap: wrap;
     }
 
-    h1 {
+    h1, h2 {
       margin: 0;
       color: #0b1f3a;
+    }
+
+    .small {
+      color: #5b6472;
+      font-size: 14px;
+      margin-top: 6px;
     }
 
     .actions {
@@ -56,60 +60,8 @@
       font-size: 14px;
     }
 
-    button:hover,
-    a.button-link:hover {
-      opacity: 0.95;
-    }
-
-    .danger {
-      background: #c62828;
-    }
-
-    .secondary {
-      background: #52627b;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 6px 18px rgba(8, 25, 53, 0.08);
-      border: 1px solid #d9dee7;
-    }
-
-    .stat-card h2 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      color: #5b6472;
-    }
-
-    .stat-card p {
-      margin: 0;
-      font-size: 24px;
-      font-weight: bold;
-      color: #0b1f3a;
-    }
-
-    .empty {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      border: 1px solid #d9dee7;
-      text-align: center;
-      color: #5b6472;
-    }
-
-    .list {
-      display: grid;
-      gap: 14px;
-    }
+    .danger { background: #c62828; }
+    .secondary { background: #52627b; }
 
     .card {
       background: white;
@@ -117,89 +69,125 @@
       padding: 18px;
       box-shadow: 0 6px 18px rgba(8, 25, 53, 0.08);
       border: 1px solid #d9dee7;
+      margin-bottom: 18px;
     }
 
-    .card-top {
+    .calendar-header {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .numero {
-      font-size: 18px;
-      font-weight: bold;
-      color: #0b1f3a;
-      margin: 0;
-    }
-
-    .small {
-      color: #5b6472;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .badge {
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: bold;
-      font-size: 13px;
-      display: inline-block;
-    }
-
-    .paid {
-      background: #e7f6ed;
-      color: #198754;
-    }
-
-    .pending {
-      background: #fff4e5;
-      color: #b26a00;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 18px;
-      margin-top: 10px;
-    }
-
-    .field {
-      background: #f8fafc;
-      border: 1px solid #e0e6ef;
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
-
-    .field strong {
-      display: block;
-      font-size: 13px;
-      color: #5b6472;
-      margin-bottom: 4px;
-    }
-
-    .card-actions {
-      margin-top: 14px;
-      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
       gap: 10px;
       flex-wrap: wrap;
     }
 
-    @media (max-width: 900px) {
-      .stats {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
     }
 
-    @media (max-width: 600px) {
-      .stats {
-        grid-template-columns: 1fr;
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day-name,
+    .day-cell {
+      text-align: center;
+      padding: 12px 8px;
+      border-radius: 12px;
+    }
+
+    .day-name {
+      font-weight: bold;
+      color: #5b6472;
+      background: #f7f9fc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .day-cell {
+      background: #fff;
+      border: 1px solid #d9dee7;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+    }
+
+    .day-cell.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    .day-cell.available {
+      background: #f8fafc;
+      color: #142033;
+    }
+
+    .day-cell.unavailable {
+      background: #ffe5e5;
+      color: #b00020;
+      border-color: #f3b4b4;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.available {
+      background: #f8fafc;
+      border: 1px solid #d9dee7;
+    }
+
+    .dot.unavailable {
+      background: #ffe5e5;
+      border: 1px solid #f3b4b4;
+    }
+
+    .dates-list {
+      margin-top: 14px;
+      padding-left: 18px;
+    }
+
+    .dates-list li {
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 700px) {
+      .calendar-grid {
+        gap: 6px;
+      }
+
+      .day-name,
+      .day-cell {
+        padding: 10px 4px;
+        font-size: 13px;
+      }
+
+      .day-cell {
+        min-height: 54px;
       }
     }
   </style>
@@ -209,193 +197,152 @@
     <div class="topbar">
       <div>
         <h1>Admin Proconvoi17</h1>
-        <p class="small">Suivi simple des devis enregistrés dans le navigateur</p>
+        <p class="small">Clique sur une date pour la rendre indisponible ou disponible.</p>
       </div>
 
       <div class="actions">
         <a href="/" class="button-link secondary">Retour au site</a>
-        <button class="danger" onclick="viderHistorique()">Vider l’historique</button>
+        <button class="danger" onclick="viderIndisponibilites()">Vider toutes les indisponibilités</button>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <h2>Nombre de devis</h2>
-        <p id="statTotal">0</p>
+    <div class="card">
+      <div class="calendar-header">
+        <h2 id="monthTitle">Planning</h2>
+
+        <div class="calendar-nav">
+          <button type="button" onclick="changerMois(-1)">Mois précédent</button>
+          <button type="button" onclick="changerMois(1)">Mois suivant</button>
+        </div>
       </div>
 
-      <div class="stat-card">
-        <h2>Payés</h2>
-        <p id="statPayes">0</p>
-      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
 
-      <div class="stat-card">
-        <h2>En attente</h2>
-        <p id="statAttente">0</p>
-      </div>
-
-      <div class="stat-card">
-        <h2>Montant total</h2>
-        <p id="statMontant">0 €</p>
+      <div class="legend">
+        <span><i class="dot available"></i> Disponible</span>
+        <span><i class="dot unavailable"></i> Indisponible</span>
       </div>
     </div>
 
-    <div id="content"></div>
+    <div class="card">
+      <h2>Dates indisponibles enregistrées</h2>
+      <ul id="datesList" class="dates-list"></ul>
+    </div>
   </div>
 
   <script>
-    function chargerHistorique() {
-      return JSON.parse(localStorage.getItem("proconvoi17_historique") || "[]");
+    const STORAGE_KEY = "proconvoi17_dates_indisponibles";
+    let currentDate = new Date();
+
+    function getDatesIndisponibles() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     }
 
-    function sauvegarderHistorique(historique) {
-      localStorage.setItem("proconvoi17_historique", JSON.stringify(historique));
+    function saveDatesIndisponibles(dates) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dates));
     }
 
-    function formatDate(dateStr) {
-      if (!dateStr) return "-";
+    function formatDateLocal(year, month, day) {
+      const m = String(month + 1).padStart(2, "0");
+      const d = String(day).padStart(2, "0");
+      return `${year}-${m}-${d}`;
+    }
 
-      const d = new Date(dateStr);
+    function toggleDate(dateStr) {
+      const dates = getDatesIndisponibles();
+      const index = dates.indexOf(dateStr);
 
-      if (isNaN(d.getTime())) {
-        return dateStr;
+      if (index >= 0) {
+        dates.splice(index, 1);
+      } else {
+        dates.push(dateStr);
       }
 
-      return d.toLocaleString("fr-FR");
+      dates.sort();
+      saveDatesIndisponibles(dates);
+      renderCalendar();
+      renderDatesList();
     }
 
-    function supprimerDevis(numeroFacture) {
-      const historique = chargerHistorique();
-      const nouveau = historique.filter(item => item.numeroFacture !== numeroFacture);
-      sauvegarderHistorique(nouveau);
-      afficherHistorique();
+    function viderIndisponibilites() {
+      if (!confirm("Supprimer toutes les indisponibilités ?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderCalendar();
+      renderDatesList();
     }
 
-    function viderHistorique() {
-      const ok = confirm("Voulez-vous vraiment vider tout l’historique ?");
-      if (!ok) return;
-
-      localStorage.removeItem("proconvoi17_historique");
-      afficherHistorique();
+    function changerMois(delta) {
+      currentDate.setMonth(currentDate.getMonth() + delta);
+      renderCalendar();
     }
 
-    function calculerStats(historique) {
-      const total = historique.length;
-      const payes = historique.filter(item => item.statutPaiement === "payé").length;
-      const attente = historique.filter(item => item.statutPaiement !== "payé").length;
-      const montant = historique.reduce((sum, item) => sum + Number(item.montant || 0), 0);
+    function renderDatesList() {
+      const list = document.getElementById("datesList");
+      const dates = getDatesIndisponibles();
 
-      document.getElementById("statTotal").textContent = total;
-      document.getElementById("statPayes").textContent = payes;
-      document.getElementById("statAttente").textContent = attente;
-      document.getElementById("statMontant").textContent = montant.toFixed(2) + " €";
-    }
-
-    function afficherHistorique() {
-      const content = document.getElementById("content");
-      const historique = chargerHistorique();
-
-      calculerStats(historique);
-
-      if (!historique.length) {
-        content.innerHTML = `
-          <div class="empty">
-            <h2>Aucun devis enregistré</h2>
-            <p>Les devis créés sur ce navigateur apparaîtront ici.</p>
-          </div>
-        `;
+      if (!dates.length) {
+        list.innerHTML = "<li>Aucune date indisponible.</li>";
         return;
       }
 
-      content.innerHTML = `
-        <div class="list">
-          ${historique.map(item => `
-            <div class="card">
-              <div class="card-top">
-                <div>
-                  <p class="numero">${item.numeroFacture || "-"}</p>
-                  <p class="small">Créé le : ${formatDate(item.dateCreation)}</p>
-                </div>
-
-                <span class="badge ${item.statutPaiement === "payé" ? "paid" : "pending"}">
-                  ${item.statutPaiement === "payé" ? "Payé" : "En attente"}
-                </span>
-              </div>
-
-              <div class="grid">
-                <div class="field">
-                  <strong>Client</strong>
-                  ${item.nom || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Email</strong>
-                  ${item.email || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Téléphone</strong>
-                  ${item.telephone || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Société</strong>
-                  ${item.societe || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Prestation</strong>
-                  ${item.prestation || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Véhicule</strong>
-                  ${item.vehicule || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Distance</strong>
-                  ${item.distance || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Jours</strong>
-                  ${item.jours || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Découchés</strong>
-                  ${item.decouches || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Date souhaitée</strong>
-                  ${item.dateSouhaitee || "-"}
-                </div>
-
-                <div class="field">
-                  <strong>Montant</strong>
-                  ${item.montant || "0.00"} €
-                </div>
-
-                <div class="field">
-                  <strong>Informations</strong>
-                  ${item.infos || "-"}
-                </div>
-              </div>
-
-              <div class="card-actions">
-                <button class="danger" onclick="supprimerDevis('${item.numeroFacture}')">
-                  Supprimer
-                </button>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
+      list.innerHTML = dates.map(date => `<li>${date}</li>`).join("");
     }
 
-    afficherHistorique();
+    function renderCalendar() {
+      const grid = document.getElementById("calendarGrid");
+      const title = document.getElementById("monthTitle");
+
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      const monthName = currentDate.toLocaleDateString("fr-FR", {
+        month: "long",
+        year: "numeric"
+      });
+
+      title.textContent = `Planning - ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`;
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      let startDay = firstDay.getDay();
+      startDay = startDay === 0 ? 6 : startDay - 1; // lundi = 0
+
+      const datesIndisponibles = getDatesIndisponibles();
+
+      grid.innerHTML = "";
+
+      const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+      dayNames.forEach(name => {
+        const el = document.createElement("div");
+        el.className = "day-name";
+        el.textContent = name;
+        grid.appendChild(el);
+      });
+
+      for (let i = 0; i < startDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day-cell empty";
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = formatDateLocal(year, month, day);
+        const isUnavailable = datesIndisponibles.includes(dateStr);
+
+        const cell = document.createElement("div");
+        cell.className = `day-cell ${isUnavailable ? "unavailable" : "available"}`;
+        cell.textContent = day;
+        cell.title = `${dateStr} - ${isUnavailable ? "Indisponible" : "Disponible"}`;
+        cell.onclick = () => toggleDate(dateStr);
+
+        grid.appendChild(cell);
+      }
+    }
+
+    renderCalendar();
+    renderDatesList();
   </script>
 </body>
 </html>
