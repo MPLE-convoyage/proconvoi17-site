@@ -624,40 +624,18 @@
       return montant;
     }
 
-    async function verifierDate() {
-      const dateChoisie = inputDate.value;
+    function verifierDate() {
+  const dateChoisie = inputDate.value;
 
-      if (!dateChoisie) {
-        etatDate.textContent = "";
-        return true;
-      }
+  if (!dateChoisie) {
+    etatDate.textContent = "";
+    return true;
+  }
 
-      try {
-        const res = await fetch(`/api/calendar/check-date?date=${dateChoisie}`);
-        const data = await res.json();
-
-        if (!res.ok) {
-          etatDate.textContent = "Erreur de vérification du planning";
-          etatDate.style.color = "red";
-          return false;
-        }
-
-        if (data.unavailable) {
-          etatDate.textContent = "❌ Date indisponible";
-          etatDate.style.color = "red";
-          return false;
-        } else {
-          etatDate.textContent = "✅ Date disponible";
-          etatDate.style.color = "green";
-          return true;
-        }
-      } catch (error) {
-        etatDate.textContent = "Erreur de vérification du planning";
-        etatDate.style.color = "red";
-        return false;
-      }
-    }
-
+  etatDate.textContent = "✅ Date à confirmer";
+  etatDate.style.color = "green";
+  return true;
+}
     function renderPaypalButtons() {
       document.getElementById("paypal-button-container").innerHTML = "";
 
