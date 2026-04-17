@@ -713,12 +713,11 @@
         return;
       }
 
-      const dateDisponible = await verifierDate();
+      const dateDisponible = verifierDate();
 
-      if (!dateDisponible) {
-        alert("Cette date est indisponible. Merci d'en choisir une autre.");
-        return;
-      }
+if (!dateDisponible) {
+  return;
+}
 
       montantGlobal = calculerMontant();
       numeroFactureGlobal = genererNumeroFacture();
@@ -789,9 +788,9 @@
     });
 
     prestation.addEventListener("change", toggleFields);
-    inputDate.addEventListener("change", async () => {
-      await verifierDate();
-    });
+    inputDate.addEventListener("change", () => {
+  verifierDate();
+});
 
     toggleFields();
   </script>
