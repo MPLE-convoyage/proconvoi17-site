@@ -375,7 +375,7 @@
           <p>✔ Réactivité</p>
           <p>✔ Tarification claire</p>
           <p>✔ Paiement sécurisé</p>
-          <p>✔ Devis envoyé automatiquement</p>
+          <p>✔ Devis et contrat envoyés automatiquement</p>
         </div>
       </div>
 
@@ -391,7 +391,7 @@
         </div>
         <div class="tarif-item">
           <strong>Conducteur PL / SPL</strong>
-          320 €/jour + 90 € / découché
+          320 € / jour (amplitude de 12h) + 90 € / découché
         </div>
       </div>
     </section>
@@ -464,8 +464,10 @@
 
         <div class="full planning-box">
           <strong>Planning</strong>
-          <p class="small">Dates déjà indisponibles :</p>
-          <ul id="listeDatesIndisponibles"></ul>
+          <p class="small">Les disponibilités sont synchronisées avec Google Calendar.</p>
+          <ul id="listeDatesIndisponibles">
+            <li>Choisissez une date pour vérifier automatiquement la disponibilité.</li>
+          </ul>
         </div>
 
         <div class="full row-actions">
@@ -514,11 +516,12 @@
       <h2>Conditions Générales de Vente (CGV)</h2>
       <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage et de conduite réalisées par Proconvoi17.</p>
       <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros et calculés selon les informations fournies lors de la demande de devis.</p>
-      <p><strong>3. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
-      <p><strong>4. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
-      <p><strong>5. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
-      <p><strong>6. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
-      <p><strong>7. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
+      <p><strong>3. Conducteur PL / SPL :</strong> Le tarif journalier est de 320 € pour une amplitude de 12 heures, avec 90 € par découché.</p>
+      <p><strong>4. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
+      <p><strong>5. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
+      <p><strong>6. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
+      <p><strong>7. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
+      <p><strong>8. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
     </section>
   </main>
 
@@ -546,43 +549,10 @@
     const paypalMessage = document.getElementById("paypal-message");
     const inputDate = document.getElementById("dateSouhaitee");
     const etatDate = document.getElementById("etatDate");
-    const listeDatesIndisponibles = document.getElementById("listeDatesIndisponibles");
 
     let montantGlobal = 0;
     let numeroFactureGlobal = "";
     let paypalRendered = false;
-
-    const datesIndisponibles = JSON.parse(
-  localStorage.getItem("proconvoi17_dates_indisponibles") || "[]"
-);
-
-    function afficherDatesIndisponibles() {
-      listeDatesIndisponibles.innerHTML = "";
-      datesIndisponibles.forEach((date) => {
-        const li = document.createElement("li");
-        li.textContent = date;
-        listeDatesIndisponibles.appendChild(li);
-      });
-    }
-
-    function verifierDate() {
-      const dateChoisie = inputDate.value;
-
-      if (!dateChoisie) {
-        etatDate.textContent = "";
-        return true;
-      }
-
-      if (datesIndisponibles.includes(dateChoisie)) {
-        etatDate.textContent = "❌ Date indisponible";
-        etatDate.style.color = "red";
-        return false;
-      } else {
-        etatDate.textContent = "✅ Date disponible";
-        etatDate.style.color = "green";
-        return true;
-      }
-    }
 
     function getHistoriqueDevis() {
       return JSON.parse(localStorage.getItem("proconvoi17_historique") || "[]");
@@ -654,6 +624,40 @@
       return montant;
     }
 
+    async function verifierDate() {
+      const dateChoisie = inputDate.value;
+
+      if (!dateChoisie) {
+        etatDate.textContent = "";
+        return true;
+      }
+
+      try {
+        const res = await fetch(`/api/calendar/check-date?date=${dateChoisie}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          etatDate.textContent = "Erreur de vérification du planning";
+          etatDate.style.color = "red";
+          return false;
+        }
+
+        if (data.unavailable) {
+          etatDate.textContent = "❌ Date indisponible";
+          etatDate.style.color = "red";
+          return false;
+        } else {
+          etatDate.textContent = "✅ Date disponible";
+          etatDate.style.color = "green";
+          return true;
+        }
+      } catch (error) {
+        etatDate.textContent = "Erreur de vérification du planning";
+        etatDate.style.color = "red";
+        return false;
+      }
+    }
+
     function renderPaypalButtons() {
       document.getElementById("paypal-button-container").innerHTML = "";
 
@@ -722,7 +726,7 @@
       }).render("#paypal-button-container");
     }
 
-    calculerBtn.addEventListener("click", () => {
+    calculerBtn.addEventListener("click", async () => {
       const nom = document.getElementById("nom").value.trim();
       const email = document.getElementById("email").value.trim();
 
@@ -731,7 +735,9 @@
         return;
       }
 
-      if (!verifierDate()) {
+      const dateDisponible = await verifierDate();
+
+      if (!dateDisponible) {
         alert("Cette date est indisponible. Merci d'en choisir une autre.");
         return;
       }
@@ -805,9 +811,10 @@
     });
 
     prestation.addEventListener("change", toggleFields);
-    inputDate.addEventListener("change", verifierDate);
+    inputDate.addEventListener("change", async () => {
+      await verifierDate();
+    });
 
-    afficherDatesIndisponibles();
     toggleFields();
   </script>
 </body>
