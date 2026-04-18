@@ -40,145 +40,219 @@ module.exports = async (req, res) => {
 
     const logoPath = path.join(process.cwd(), "logo-proconvoi17.png");
     const hasLogo = fs.existsSync(logoPath);
-
     const isConducteur = prestation === "conducteur" || prestation === "Conducteur PL / SPL";
 
-    function drawHeader(doc, title) {
+    const ENTREPRISE_NOM = "Proconvoi17";
+    const ENTREPRISE_CONTACT = "PLE Mickael";
+    const ENTREPRISE_TEL = "07 63 08 26 37";
+    const ENTREPRISE_EMAIL = "contact@proconvoi17.fr";
+    const ENTREPRISE_ADRESSE = "Saintes";
+    const ENTREPRISE_SIRET = "532 293 461 00044";
+
+    function safe(v) {
+      return v && String(v).trim() ? String(v) : "-";
+    }
+
+    function drawPageHeader(doc, title) {
+      doc.rect(0, 0, 595, 95).fill("#0b1f3a");
+
       if (hasLogo) {
         try {
-          doc.image(logoPath, 50, 40, { width: 80 });
+          doc.image(logoPath, 42, 18, { width: 58 });
         } catch (_) {}
       }
 
       doc
-        .fillColor("#0b1f3a")
+        .fillColor("#ffffff")
         .fontSize(24)
-        .text("PROCONVOI17", hasLogo ? 145 : 50, 48, { align: "left" });
+        .font("Helvetica-Bold")
+        .text("PROCONVOI17", hasLogo ? 115 : 42, 24);
 
       doc
-        .fontSize(11)
-        .fillColor("#52627b")
-        .text("Convoyage VL / PL / SPL - Conducteur PL / SPL indépendant", hasLogo ? 145 : 50, 78);
+        .fontSize(10)
+        .font("Helvetica")
+        .fillColor("#d8e2f0")
+        .text("Convoyage VL / PL / SPL - Conducteur PL / SPL indépendant", hasLogo ? 115 : 42, 54);
 
       doc
-        .moveTo(50, 120)
-        .lineTo(545, 120)
-        .strokeColor("#d9dee7")
-        .stroke();
-
-      doc
-        .moveDown(3)
-        .fontSize(20)
         .fillColor("#0b1f3a")
-        .text(title, 50, 140, { align: "center" });
+        .fontSize(20)
+        .font("Helvetica-Bold")
+        .text(title, 50, 120, { align: "center", width: 495 });
 
-      doc.moveDown(2);
+      doc.moveDown();
     }
 
-    function drawSectionTitle(doc, text) {
+    function drawInfoBox(doc, x, y, w, h, title, lines) {
       doc
-        .moveDown(0.8)
-        .fontSize(13)
+        .roundedRect(x, y, w, h, 10)
+        .fillAndStroke("#f8fafc", "#d9dee7");
+
+      doc
         .fillColor("#0b1f3a")
-        .text(text);
+        .fontSize(11)
+        .font("Helvetica-Bold")
+        .text(title, x + 12, y + 10);
+
+      let currentY = y + 30;
+      lines.forEach((line) => {
+        doc
+          .fillColor("#142033")
+          .fontSize(10)
+          .font("Helvetica")
+          .text(line, x + 12, currentY, { width: w - 24 });
+        currentY += 15;
+      });
+    }
+
+    function drawSectionTitle(doc, title, y = null) {
+      if (y !== null) doc.y = y;
+
+      doc.moveDown(0.8);
+      doc
+        .fillColor("#0b1f3a")
+        .fontSize(13)
+        .font("Helvetica-Bold")
+        .text(title);
 
       doc
         .moveTo(50, doc.y + 4)
         .lineTo(545, doc.y + 4)
-        .strokeColor("#e5e7eb")
+        .strokeColor("#d9dee7")
         .stroke();
 
       doc.moveDown(0.8);
     }
 
-    function drawField(doc, label, value) {
+    function drawFieldRow(doc, label, value) {
+      const y = doc.y;
+
       doc
-        .fontSize(10)
         .fillColor("#5b6472")
-        .text(label);
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .text(label, 55, y, { width: 150 });
 
       doc
-        .fontSize(12)
         .fillColor("#142033")
-        .text(value || "-");
+        .fontSize(11)
+        .font("Helvetica")
+        .text(safe(value), 190, y, { width: 330 });
 
-      doc.moveDown(0.4);
+      doc.moveDown(0.9);
     }
 
-    function drawTotalBox(doc, total) {
-      const y = doc.y + 10;
+    function drawTotal(doc, total) {
+      const y = doc.y + 8;
 
       doc
-        .roundedRect(330, y, 215, 52, 10)
-        .fillAndStroke("#f8fafc", "#d9dee7");
+        .roundedRect(320, y, 225, 62, 12)
+        .fillAndStroke("#eef4ff", "#b9c9e6");
 
       doc
         .fillColor("#5b6472")
         .fontSize(10)
-        .text("Montant estimatif", 345, y + 10);
+        .font("Helvetica-Bold")
+        .text("MONTANT ESTIMATIF", 336, y + 12);
 
       doc
         .fillColor("#0b1f3a")
-        .fontSize(18)
-        .text(`${total} €`, 345, y + 24);
+        .fontSize(22)
+        .font("Helvetica-Bold")
+        .text(`${safe(total)} €`, 336, y + 28);
 
-      doc.moveDown(4);
+      doc.moveDown(4.2);
     }
 
-    function footer(doc, reference) {
+    function drawEntrepriseFooter(doc, reference) {
       doc
-        .fontSize(9)
-        .fillColor("#7b8494")
-        .text(`Référence : ${reference}`, 50, 760, { align: "center", width: 495 });
+        .strokeColor("#d9dee7")
+        .moveTo(50, 728)
+        .lineTo(545, 728)
+        .stroke();
+
+      doc
+        .fillColor("#5b6472")
+        .fontSize(8.5)
+        .font("Helvetica")
+        .text(
+          `${ENTREPRISE_NOM} - ${ENTREPRISE_CONTACT} - ${ENTREPRISE_TEL} - ${ENTREPRISE_EMAIL}`,
+          50,
+          738,
+          { width: 495, align: "center" }
+        );
+
+      doc
+        .text(
+          `${ENTREPRISE_ADRESSE} - SIRET : ${ENTREPRISE_SIRET}`,
+          50,
+          750,
+          { width: 495, align: "center" }
+        );
+
+      doc
+        .text(`Référence : ${reference}`, 50, 762, { width: 495, align: "center" });
     }
 
     function generateDevisPDF() {
       return new Promise((resolve, reject) => {
         try {
-          const doc = new PDFDocument({ margin: 50, size: "A4" });
+          const doc = new PDFDocument({ size: "A4", margin: 40 });
           const buffers = [];
 
           doc.on("data", (chunk) => buffers.push(chunk));
           doc.on("end", () => resolve(Buffer.concat(buffers)));
           doc.on("error", reject);
 
-          drawHeader(doc, "DEVIS");
+          drawPageHeader(doc, "DEVIS");
 
-          drawSectionTitle(doc, "Informations client");
-          drawField(doc, "Nom", nom);
-          drawField(doc, "Email", email);
-          drawField(doc, "Téléphone", telephone);
-          drawField(doc, "Société", societe);
+          drawInfoBox(doc, 50, 165, 230, 95, "CLIENT", [
+            `Nom : ${safe(nom)}`,
+            `Email : ${safe(email)}`,
+            `Téléphone : ${safe(telephone)}`,
+            `Société : ${safe(societe)}`
+          ]);
 
-          drawSectionTitle(doc, "Détails de la prestation");
+          drawInfoBox(doc, 315, 165, 230, 95, "RÉFÉRENCE", [
+            `Numéro : ${safe(numeroFacture)}`,
+            `Date souhaitée : ${safe(dateSouhaitee)}`,
+            `Statut : En attente`,
+            `Entreprise : ${ENTREPRISE_NOM}`
+          ]);
+
+          doc.y = 285;
+          drawSectionTitle(doc, "Détails de la prestation", 285);
 
           if (isConducteur) {
-            drawField(doc, "Prestation", "Conducteur PL / SPL");
-            drawField(doc, "Tarif journalier", "320 € / jour");
-            drawField(doc, "Amplitude journalière", "12h");
-            drawField(doc, "Découché", "90 €");
-            drawField(doc, "Nombre de jours", jours);
-            drawField(doc, "Nombre de découchés", decouches);
+            drawFieldRow(doc, "Prestation", "Conducteur PL / SPL");
+            drawFieldRow(doc, "Tarif journalier", "320 € / jour");
+            drawFieldRow(doc, "Amplitude journalière", "12h");
+            drawFieldRow(doc, "Découché", "90 €");
+            drawFieldRow(doc, "Nombre de jours", jours);
+            drawFieldRow(doc, "Nombre de découchés", decouches);
           } else {
-            drawField(doc, "Prestation", prestation);
-            drawField(doc, "Type de véhicule", vehicule);
-            drawField(doc, "Distance", distance);
+            drawFieldRow(doc, "Prestation", prestation === "convoyage" ? "Convoyage" : prestation);
+            drawFieldRow(doc, "Type de véhicule", vehicule === "vl" ? "VL - 0,98 €/km" : vehicule === "pl" ? "PL / SPL - 2,20 €/km" : vehicule);
+            drawFieldRow(doc, "Distance", distance ? `${distance} km` : "-");
           }
 
-          drawField(doc, "Date souhaitée", dateSouhaitee);
-          drawField(doc, "Informations complémentaires", infos);
+          drawFieldRow(doc, "Date souhaitée", dateSouhaitee);
+          drawFieldRow(doc, "Informations complémentaires", infos);
 
-          drawTotalBox(doc, montant);
+          drawTotal(doc, montant);
 
-          doc.moveDown(1.5);
+          drawSectionTitle(doc, "Conditions de paiement");
           doc
-            .fontSize(10)
-            .fillColor("#5b6472")
-            .text("Ce devis est fourni à titre estimatif selon les informations communiquées.", {
-              align: "left"
-            });
+            .fillColor("#142033")
+            .fontSize(11)
+            .font("Helvetica")
+            .text("Le paiement peut s’effectuer via PayPal ou tout autre moyen convenu entre les parties.", { width: 495 })
+            .moveDown(0.4)
+            .text("La prestation peut être confirmée après règlement ou acompte selon l’accord convenu.", { width: 495 })
+            .moveDown(0.4)
+            .text("Toute mission commencée ou réservée peut entraîner des frais en cas d’annulation tardive.", { width: 495 });
 
-          footer(doc, numeroFacture);
+          drawEntrepriseFooter(doc, numeroFacture);
           doc.end();
         } catch (error) {
           reject(error);
@@ -189,82 +263,123 @@ module.exports = async (req, res) => {
     function generateContratPDF() {
       return new Promise((resolve, reject) => {
         try {
-          const doc = new PDFDocument({ margin: 50, size: "A4" });
+          const doc = new PDFDocument({ size: "A4", margin: 40 });
           const buffers = [];
 
           doc.on("data", (chunk) => buffers.push(chunk));
           doc.on("end", () => resolve(Buffer.concat(buffers)));
           doc.on("error", reject);
 
-          drawHeader(doc, "CONTRAT DE PRESTATION");
+          drawPageHeader(doc, "CONTRAT DE PRESTATION");
 
-          drawSectionTitle(doc, "Parties");
-          drawField(doc, "Prestataire", "Proconvoi17");
-          drawField(doc, "Client", nom);
-          drawField(doc, "Email client", email);
-          drawField(doc, "Téléphone client", telephone);
-          drawField(doc, "Société", societe);
+          drawInfoBox(doc, 50, 165, 230, 95, "PRESTATAIRE", [
+            ENTREPRISE_NOM,
+            ENTREPRISE_CONTACT,
+            ENTREPRISE_TEL,
+            `Référence : ${safe(numeroFacture)}`
+          ]);
 
-          drawSectionTitle(doc, "Objet du contrat");
+          drawInfoBox(doc, 315, 165, 230, 95, "CLIENT", [
+            `Nom : ${safe(nom)}`,
+            `Email : ${safe(email)}`,
+            `Téléphone : ${safe(telephone)}`,
+            `Société : ${safe(societe)}`
+          ]);
+
+          doc.y = 285;
+          drawSectionTitle(doc, "Objet du contrat", 285);
 
           if (isConducteur) {
-            drawField(doc, "Prestation demandée", "Conducteur PL / SPL");
-            drawField(doc, "Tarif journalier", "320 € / jour");
-            drawField(doc, "Amplitude journalière", "12h");
-            drawField(doc, "Découché", "90 €");
-            drawField(doc, "Nombre de jours", jours);
-            drawField(doc, "Nombre de découchés", decouches);
+            drawFieldRow(doc, "Prestation demandée", "Conducteur PL / SPL");
+            drawFieldRow(doc, "Tarif journalier", "320 € / jour");
+            drawFieldRow(doc, "Amplitude journalière", "12h");
+            drawFieldRow(doc, "Découché", "90 €");
+            drawFieldRow(doc, "Nombre de jours", jours);
+            drawFieldRow(doc, "Nombre de découchés", decouches);
           } else {
-            drawField(doc, "Prestation demandée", prestation);
-            drawField(doc, "Véhicule", vehicule);
-            drawField(doc, "Distance", distance);
+            drawFieldRow(doc, "Prestation demandée", prestation === "convoyage" ? "Convoyage" : prestation);
+            drawFieldRow(doc, "Type de véhicule", vehicule === "vl" ? "VL - 0,98 €/km" : vehicule === "pl" ? "PL / SPL - 2,20 €/km" : vehicule);
+            drawFieldRow(doc, "Distance prévue", distance ? `${distance} km` : "-");
           }
 
-          drawField(doc, "Date prévue", dateSouhaitee);
+          drawFieldRow(doc, "Date prévue", dateSouhaitee);
+          drawFieldRow(doc, "Montant estimatif", `${safe(montant)} €`);
 
-          drawSectionTitle(doc, "Conditions financières");
-          drawField(doc, "Montant estimatif", `${montant} €`);
-          drawField(doc, "Référence", numeroFacture);
-
-          drawSectionTitle(doc, "Conditions");
+          drawSectionTitle(doc, "Conditions générales");
           doc
-            .fontSize(11)
             .fillColor("#142033")
-            .text("Le client reconnaît avoir pris connaissance de la prestation proposée et des conditions tarifaires.")
+            .fontSize(11)
+            .font("Helvetica")
+            .text("Le client reconnaît avoir pris connaissance de la prestation proposée et des conditions tarifaires.", { width: 495 })
             .moveDown(0.5)
-            .text("Le paiement valide l’acceptation de la mission selon les éléments indiqués dans le devis.")
+            .text("Le paiement valide l’acceptation de la mission selon les éléments indiqués dans le devis.", { width: 495 })
             .moveDown(0.5)
-            .text("Toute annulation tardive peut entraîner des frais selon l’avancement de la mission.")
+            .text("Toute annulation tardive peut entraîner des frais selon l’avancement de la mission.", { width: 495 })
             .moveDown(0.5)
-            .text("Les données communiquées sont utilisées uniquement pour le traitement de la demande.")
-            .moveDown(1);
+            .text("Les données communiquées sont utilisées uniquement pour le traitement de la demande.", { width: 495 });
+
+          doc.moveDown(0.8);
+          drawSectionTitle(doc, "Conditions de paiement");
+          doc
+            .fillColor("#142033")
+            .fontSize(11)
+            .font("Helvetica")
+            .text("Le règlement s’effectue via PayPal ou tout autre mode de paiement convenu.", { width: 495 })
+            .moveDown(0.5)
+            .text("Le paiement ou l’acompte peut être exigé avant le début de la mission.", { width: 495 })
+            .moveDown(0.5)
+            .text("En cas de retard de paiement, la mission peut être suspendue ou reportée.", { width: 495 });
 
           if (infos) {
+            doc.moveDown(0.8);
             drawSectionTitle(doc, "Informations complémentaires");
-            doc.fontSize(11).fillColor("#142033").text(infos);
-            doc.moveDown(1);
+            doc
+              .font("Helvetica")
+              .fillColor("#142033")
+              .fontSize(11)
+              .text(infos, { width: 495 });
           }
 
+          doc.moveDown(1);
           drawSectionTitle(doc, "Signatures");
+
+          const baseY = doc.y + 15;
+
           doc
-            .fontSize(11)
-            .fillColor("#142033")
-            .text("Signature client :", 50, doc.y + 10)
-            .moveTo(160, doc.y + 15)
-            .lineTo(320, doc.y + 15)
-            .strokeColor("#999999")
+            .roundedRect(50, baseY, 220, 85, 10)
+            .strokeColor("#d9dee7")
             .stroke();
 
           doc
-            .fontSize(11)
-            .fillColor("#142033")
-            .text("Signature Proconvoi17 :", 50, doc.y + 50)
-            .moveTo(200, doc.y + 55)
-            .lineTo(380, doc.y + 55)
-            .strokeColor("#999999")
+            .roundedRect(325, baseY, 220, 85, 10)
+            .strokeColor("#d9dee7")
             .stroke();
 
-          footer(doc, numeroFacture);
+          doc
+            .fillColor("#0b1f3a")
+            .font("Helvetica-Bold")
+            .fontSize(11)
+            .text("Signature client", 65, baseY + 12);
+
+          doc
+            .fillColor("#0b1f3a")
+            .font("Helvetica-Bold")
+            .fontSize(11)
+            .text("Signature Proconvoi17", 340, baseY + 12);
+
+          doc
+            .strokeColor("#999999")
+            .moveTo(65, baseY + 58)
+            .lineTo(245, baseY + 58)
+            .stroke();
+
+          doc
+            .strokeColor("#999999")
+            .moveTo(340, baseY + 58)
+            .lineTo(520, baseY + 58)
+            .stroke();
+
+          drawEntrepriseFooter(doc, numeroFacture);
           doc.end();
         } catch (error) {
           reject(error);
