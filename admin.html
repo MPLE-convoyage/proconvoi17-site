@@ -255,7 +255,7 @@
       <p class="small">Cette page est protégée par mot de passe.</p>
 
       <label for="adminPassword">Mot de passe</label>
-      <input type="password" id="adminPassword" placeholder="Margaux-17" />
+      <input type="password" id="adminPassword" placeholder=Margaux-17 />
 
       <button onclick="verifierMotDePasse()">Se connecter</button>
       <p id="loginError" class="error hidden">Mot de passe incorrect.</p>
@@ -271,17 +271,16 @@
 
       <div class="actions">
         <a href="/" class="button-link secondary">Retour au site</a>
-        <a href="https://calendar.google.com/" target="_blank" class="button-link secondary">Ouvrir Google Calendar</a>
         <button onclick="logout()">Se déconnecter</button>
         <button class="danger" onclick="viderHistorique()">Vider l’historique</button>
       </div>
     </div>
 
     <div class="card calendar-card">
-  <h2>Planning</h2>
-  <p>Le planning Google Calendar est désactivé pour le moment.</p>
-  <p class="small">Les dates choisies par les clients apparaissent dans les devis enregistrés.</p>
-</div>
+      <h2>Planning</h2>
+      <p>Le planning Google Calendar est désactivé pour le moment.</p>
+      <p class="small">Les dates choisies par les clients apparaissent dans les devis enregistrés.</p>
+    </div>
 
     <div class="stats">
       <div class="stat-card">
@@ -309,7 +308,7 @@
   </div>
 
   <script>
-    const ADMIN_PASSWORD = "Margaux-17";
+    const ADMIN_PASSWORD = "MON_MOT_DE_PASSE_ADMIN";
     const SESSION_KEY = "proconvoi17_admin_logged";
 
     function verifierMotDePasse() {
@@ -353,6 +352,23 @@
       }
 
       return d.toLocaleString("fr-FR");
+    }
+
+    function formatPrestation(item) {
+      if (item.prestation === "conducteur") {
+        return "Conducteur PL / SPL";
+      }
+      if (item.prestation === "convoyage") {
+        return "Convoyage";
+      }
+      return item.prestation || "-";
+    }
+
+    function formatModeFacturation(item) {
+      if (item.prestation !== "conducteur") return "-";
+      if (item.modeFacturation === "horaire") return "Mission courte à l'heure";
+      if (item.modeFacturation === "journee") return "Forfait journée";
+      return "-";
     }
 
     function supprimerDevis(numeroFacture) {
@@ -436,7 +452,12 @@
 
                 <div class="field">
                   <strong>Prestation</strong>
-                  ${item.prestation === "conducteur" ? "Conducteur PL / SPL" : item.prestation || "-"}
+                  ${formatPrestation(item)}
+                </div>
+
+                <div class="field">
+                  <strong>Mode de facturation</strong>
+                  ${formatModeFacturation(item)}
                 </div>
 
                 <div class="field">
@@ -446,12 +467,17 @@
 
                 <div class="field">
                   <strong>Distance</strong>
-                  ${item.distance || "-"}
+                  ${item.distance ? item.distance + " km" : "-"}
                 </div>
 
                 <div class="field">
                   <strong>Jours</strong>
                   ${item.jours || "-"}
+                </div>
+
+                <div class="field">
+                  <strong>Heures</strong>
+                  ${item.heures || "-"}
                 </div>
 
                 <div class="field">
