@@ -297,8 +297,8 @@ module.exports = async (req, res) => {
 
           if (isConducteur) {
             addFieldRow(doc, "Prestation", "Conducteur PL / SPL");
-            addFieldRow(doc, "Tarif journalier", "320 € / jour");
-            addFieldRow(doc, "Amplitude journalière", "12h");
+            addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
             addFieldRow(doc, "Découché", "90 €");
             addFieldRow(doc, "Nombre de jours", jours);
             addFieldRow(doc, "Nombre de découchés", decouches);
