@@ -297,11 +297,6 @@
       margin-top: 12px;
     }
 
-    .planning-box ul {
-      margin: 8px 0 0;
-      padding-left: 18px;
-    }
-
     footer {
       text-align: center;
       padding: 24px 16px 34px;
@@ -364,8 +359,8 @@
             disposition de conducteur PL / SPL indépendant.
           </p>
           <p>
-            Le site vous permet d’obtenir un devis rapide, d’imprimer votre récapitulatif,
-            de recevoir un PDF et d’effectuer votre paiement en ligne via PayPal.
+            Le site vous permet d’obtenir un devis rapide, de recevoir vos PDF
+            et d’effectuer votre paiement en ligne via PayPal.
           </p>
           <p class="small">Service simple, rapide et efficace.</p>
         </div>
@@ -390,10 +385,11 @@
           2,20 €/km + 26% de frais de route – minimum 90 €
         </div>
         <div class="tarif-item">
-          Conducteur PL / SPL  
-320 €/jour (amplitude 12h)  
-32 €/heure (minimum 3h)  
-+ 90 € / découché
+          <strong>Conducteur PL / SPL</strong>
+          320 € / jour (amplitude 12h)<br>
+          32 € / heure (minimum 3h)<br>
+          Minimum de facturation : 100 €<br>
+          + 90 € / découché
         </div>
       </div>
     </section>
@@ -443,9 +439,22 @@
           <input type="number" id="distance" min="0" step="1" value="0" />
         </div>
 
+        <div id="modeFacturationBloc" class="hidden">
+          <label for="modeFacturation">Mode de facturation</label>
+          <select id="modeFacturation">
+            <option value="journee">Forfait journée</option>
+            <option value="horaire">Mission courte à l'heure</option>
+          </select>
+        </div>
+
         <div id="joursBloc" class="hidden">
           <label for="jours">Nombre de jours</label>
           <input type="number" id="jours" min="0" step="1" value="1" />
+        </div>
+
+        <div id="heuresBloc" class="hidden">
+          <label for="heures">Nombre d'heures</label>
+          <input type="number" id="heures" min="0" step="1" value="3" />
         </div>
 
         <div id="decouchesBloc" class="hidden">
@@ -467,8 +476,6 @@
         <div class="full planning-box">
           <strong>Planning</strong>
           <p class="small">Choisissez une date souhaitée. La disponibilité sera confirmée ensuite.</p>
-            <li>Choisissez une date pour vérifier automatiquement la disponibilité.</li>
-          </ul>
         </div>
 
         <div class="full row-actions">
@@ -517,12 +524,13 @@
       <h2>Conditions Générales de Vente (CGV)</h2>
       <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage et de conduite réalisées par Proconvoi17.</p>
       <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros et calculés selon les informations fournies lors de la demande de devis.</p>
-      <p><strong>3. Conducteur PL / SPL :</strong> Le tarif journalier est de 320 € pour une amplitude de 12 heures, avec 90 € par découché.</p>
-      <p><strong>4. Paiement :</strong> Le paiement s’effectue via PayPal ou tout autre moyen convenu. La prestation peut être conditionnée au règlement.</p>
-      <p><strong>5. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
-      <p><strong>6. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
-      <p><strong>7. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
-      <p><strong>8. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
+      <p><strong>3. Conducteur PL / SPL :</strong> Le tarif journalier est de 320 € pour une amplitude de 12 heures. Les missions courtes peuvent être facturées à 32 € / heure avec un minimum de 3 heures. Un minimum de facturation de 100 € s’applique. Les découchés sont facturés 90 €.</p>
+      <p><strong>4. Modes de paiement :</strong> Le règlement s’effectue uniquement par virement bancaire ou en espèces. Les paiements par chèque ne sont pas acceptés.</p>
+      <p><strong>5. Délais de paiement :</strong> Le paiement est exigible en fin de mission, sauf accord préalable entre les parties. Un acompte peut être demandé pour certaines prestations.</p>
+      <p><strong>6. Responsabilité :</strong> Proconvoi17 s’engage à effectuer les prestations avec sérieux. La responsabilité ne pourra être engagée en cas de force majeure.</p>
+      <p><strong>7. Annulation :</strong> Toute annulation doit être signalée à l’avance. Des frais peuvent s’appliquer selon l’avancement de la mission.</p>
+      <p><strong>8. Données personnelles :</strong> Les informations collectées sont utilisées uniquement pour le traitement des demandes et ne sont pas revendues.</p>
+      <p><strong>9. Droit applicable :</strong> Les présentes CGV sont soumises au droit français.</p>
     </section>
   </main>
 
@@ -536,7 +544,9 @@
     const prestation = document.getElementById("prestation");
     const vehiculeBloc = document.getElementById("vehiculeBloc");
     const distanceBloc = document.getElementById("distanceBloc");
+    const modeFacturationBloc = document.getElementById("modeFacturationBloc");
     const joursBloc = document.getElementById("joursBloc");
+    const heuresBloc = document.getElementById("heuresBloc");
     const decouchesBloc = document.getElementById("decouchesBloc");
 
     const calculerBtn = document.getElementById("calculerBtn");
@@ -550,6 +560,7 @@
     const paypalMessage = document.getElementById("paypal-message");
     const inputDate = document.getElementById("dateSouhaitee");
     const etatDate = document.getElementById("etatDate");
+    const modeFacturation = document.getElementById("modeFacturation");
 
     let montantGlobal = 0;
     let numeroFactureGlobal = "";
@@ -594,13 +605,23 @@
       if (prestation.value === "convoyage") {
         vehiculeBloc.classList.remove("hidden");
         distanceBloc.classList.remove("hidden");
+        modeFacturationBloc.classList.add("hidden");
         joursBloc.classList.add("hidden");
+        heuresBloc.classList.add("hidden");
         decouchesBloc.classList.add("hidden");
       } else {
         vehiculeBloc.classList.add("hidden");
         distanceBloc.classList.add("hidden");
-        joursBloc.classList.remove("hidden");
+        modeFacturationBloc.classList.remove("hidden");
         decouchesBloc.classList.remove("hidden");
+
+        if (modeFacturation.value === "journee") {
+          joursBloc.classList.remove("hidden");
+          heuresBloc.classList.add("hidden");
+        } else {
+          joursBloc.classList.add("hidden");
+          heuresBloc.classList.remove("hidden");
+        }
       }
     }
 
@@ -617,26 +638,38 @@
 
         if (montant < 90) montant = 90;
       } else {
-        const jours = parseFloat(document.getElementById("jours").value) || 0;
         const decouches = parseFloat(document.getElementById("decouches").value) || 0;
-        montant = (jours * 320) + (decouches * 90);
+
+        if (modeFacturation.value === "journee") {
+          const jours = parseFloat(document.getElementById("jours").value) || 0;
+          montant = (jours * 320) + (decouches * 90);
+        } else {
+          let heures = parseFloat(document.getElementById("heures").value) || 0;
+
+          if (heures < 3) heures = 3;
+
+          montant = (heures * 32) + (decouches * 90);
+        }
+
+        if (montant < 100) montant = 100;
       }
 
       return montant;
     }
 
     function verifierDate() {
-  const dateChoisie = inputDate.value;
+      const dateChoisie = inputDate.value;
 
-  if (!dateChoisie) {
-    etatDate.textContent = "";
-    return true;
-  }
+      if (!dateChoisie) {
+        etatDate.textContent = "";
+        return true;
+      }
 
-  etatDate.textContent = "✅ Date à confirmer";
-  etatDate.style.color = "green";
-  return true;
-}
+      etatDate.textContent = "✅ Date à confirmer";
+      etatDate.style.color = "green";
+      return true;
+    }
+
     function renderPaypalButtons() {
       document.getElementById("paypal-button-container").innerHTML = "";
 
@@ -705,7 +738,7 @@
       }).render("#paypal-button-container");
     }
 
-    calculerBtn.addEventListener("click", async () => {
+    calculerBtn.addEventListener("click", () => {
       const nom = document.getElementById("nom").value.trim();
       const email = document.getElementById("email").value.trim();
 
@@ -716,9 +749,9 @@
 
       const dateDisponible = verifierDate();
 
-if (!dateDisponible) {
-  return;
-}
+      if (!dateDisponible) {
+        return;
+      }
 
       montantGlobal = calculerMontant();
       numeroFactureGlobal = genererNumeroFacture();
@@ -735,9 +768,11 @@ if (!dateDisponible) {
         telephone: document.getElementById("telephone").value,
         societe: document.getElementById("societe").value,
         prestation: prestation.value,
+        modeFacturation: modeFacturation ? modeFacturation.value : "",
         vehicule: document.getElementById("vehicule").value,
         distance: document.getElementById("distance").value,
         jours: document.getElementById("jours").value,
+        heures: document.getElementById("heures") ? document.getElementById("heures").value : "",
         decouches: document.getElementById("decouches").value,
         dateSouhaitee: document.getElementById("dateSouhaitee").value,
         infos: document.getElementById("infos").value,
@@ -789,9 +824,10 @@ if (!dateDisponible) {
     });
 
     prestation.addEventListener("change", toggleFields);
+    modeFacturation.addEventListener("change", toggleFields);
     inputDate.addEventListener("change", () => {
-  verifierDate();
-});
+      verifierDate();
+    });
 
     toggleFields();
   </script>
