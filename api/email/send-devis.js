@@ -365,8 +365,8 @@ addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
 
           if (isConducteur) {
             addFieldRow(doc, "Prestation demandée", "Conducteur PL / SPL");
-            addFieldRow(doc, "Tarif journalier", "320 € / jour");
-            addFieldRow(doc, "Amplitude journalière", "12h");
+            addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
             addFieldRow(doc, "Découché", "90 €");
             addFieldRow(doc, "Nombre de jours", jours);
             addFieldRow(doc, "Nombre de découchés", decouches);
@@ -392,7 +392,7 @@ addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
           addParagraph(doc, "Le paiement valide l’acceptation de la mission selon les éléments indiqués dans le devis.");
           addParagraph(doc, "Toute annulation tardive peut entraîner des frais selon l’avancement de la mission.");
           addParagraph(doc, "Les données communiquées sont utilisées uniquement pour le traitement de la demande.");
-
+addParagraph(doc, "Les missions courtes peuvent être facturées à l’heure sur la base de 32 € / heure avec un minimum de 3 heures.");
           addSectionTitle(doc, "Conditions de paiement");
           addParagraph(doc, "Le règlement s’effectue via PayPal ou tout autre mode de paiement convenu.");
           addParagraph(doc, "Le paiement ou l’acompte peut être exigé avant le début de la mission.");
