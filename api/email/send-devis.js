@@ -14,9 +14,11 @@ module.exports = async (req, res) => {
       telephone,
       societe,
       prestation,
+      modeFacturation,
       vehicule,
       distance,
       jours,
+      heures,
       decouches,
       dateSouhaitee,
       infos,
@@ -297,10 +299,17 @@ module.exports = async (req, res) => {
 
           if (isConducteur) {
             addFieldRow(doc, "Prestation", "Conducteur PL / SPL");
-            addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
-addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
+            if (modeFacturation === "horaire") {
+              addFieldRow(doc, "Mode de facturation", "Mission courte à l'heure");
+              addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
+              addFieldRow(doc, "Minimum de facturation", "100 €");
+              addFieldRow(doc, "Nombre d'heures", heures);
+            } else {
+              addFieldRow(doc, "Mode de facturation", "Forfait journée");
+              addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+              addFieldRow(doc, "Nombre de jours", jours);
+            }
             addFieldRow(doc, "Découché", "90 €");
-            addFieldRow(doc, "Nombre de jours", jours);
             addFieldRow(doc, "Nombre de découchés", decouches);
           } else {
             addFieldRow(doc, "Prestation", prestation === "convoyage" ? "Convoyage" : prestation);
@@ -322,9 +331,11 @@ addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
           addTotalBox(doc, montant);
 
           addSectionTitle(doc, "Conditions de paiement");
-          addParagraph(doc, "Le paiement peut s’effectuer via PayPal ou tout autre moyen convenu entre les parties.");
-          addParagraph(doc, "La prestation peut être confirmée après règlement ou acompte selon l’accord convenu.");
-          addParagraph(doc, "Toute mission commencée ou réservée peut entraîner des frais en cas d’annulation tardive.");
+          addParagraph(doc, "Le règlement s’effectue uniquement par virement bancaire ou en espèces.");
+          addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
+          addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord préalable entre les parties.");
+          addParagraph(doc, "Un acompte peut être demandé pour certaines prestations.");
+          addParagraph(doc, "En cas de retard de paiement, des pénalités peuvent être appliquées conformément à la réglementation.");
 
           addFooter(doc, numeroFacture);
           doc.end();
@@ -365,10 +376,17 @@ addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
 
           if (isConducteur) {
             addFieldRow(doc, "Prestation demandée", "Conducteur PL / SPL");
-            addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
-addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
+            if (modeFacturation === "horaire") {
+              addFieldRow(doc, "Mode de facturation", "Mission courte à l'heure");
+              addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
+              addFieldRow(doc, "Minimum de facturation", "100 €");
+              addFieldRow(doc, "Nombre d'heures", heures);
+            } else {
+              addFieldRow(doc, "Mode de facturation", "Forfait journée");
+              addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+              addFieldRow(doc, "Nombre de jours", jours);
+            }
             addFieldRow(doc, "Découché", "90 €");
-            addFieldRow(doc, "Nombre de jours", jours);
             addFieldRow(doc, "Nombre de découchés", decouches);
           } else {
             addFieldRow(doc, "Prestation demandée", prestation === "convoyage" ? "Convoyage" : prestation);
@@ -392,11 +410,13 @@ addFieldRow(doc, "Tarif horaire", "32 € / heure (minimum 3h)");
           addParagraph(doc, "Le paiement valide l’acceptation de la mission selon les éléments indiqués dans le devis.");
           addParagraph(doc, "Toute annulation tardive peut entraîner des frais selon l’avancement de la mission.");
           addParagraph(doc, "Les données communiquées sont utilisées uniquement pour le traitement de la demande.");
-addParagraph(doc, "Les missions courtes peuvent être facturées à l’heure sur la base de 32 € / heure avec un minimum de 3 heures.");
+
           addSectionTitle(doc, "Conditions de paiement");
-          addParagraph(doc, "Le règlement s’effectue via PayPal ou tout autre mode de paiement convenu.");
-          addParagraph(doc, "Le paiement ou l’acompte peut être exigé avant le début de la mission.");
-          addParagraph(doc, "En cas de retard de paiement, la mission peut être suspendue ou reportée.");
+          addParagraph(doc, "Le règlement s’effectue uniquement par virement bancaire ou en espèces.");
+          addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
+          addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord spécifique.");
+          addParagraph(doc, "Un acompte peut être demandé avant le début de la prestation.");
+          addParagraph(doc, "En cas de retard de paiement, la prestation peut être suspendue ou reportée.");
 
           if (infos) {
             addSectionTitle(doc, "Informations complémentaires");
