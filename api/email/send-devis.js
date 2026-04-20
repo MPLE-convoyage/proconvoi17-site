@@ -331,10 +331,15 @@ module.exports = async (req, res) => {
           addTotalBox(doc, montant);
 
           addSectionTitle(doc, "Conditions de paiement");
-          addParagraph(doc, "Le règlement s’effectue uniquement par virement bancaire ou en espèces.");
-          addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
-          addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord préalable entre les parties.");
-          addParagraph(doc, "Un acompte peut être demandé pour certaines prestations.");
+
+addParagraph(doc, "Le règlement peut s’effectuer par PayPal, carte bancaire ou virement bancaire.");
+addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
+addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord préalable entre les parties.");
+addParagraph(doc, "Un acompte peut être demandé pour certaines prestations.");
+          addSectionTitle(doc, "Coordonnées bancaires");
+
+addParagraph(doc, "Titulaire : Proconvoi17");
+addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
           addParagraph(doc, "En cas de retard de paiement, des pénalités peuvent être appliquées conformément à la réglementation.");
 
           addFooter(doc, numeroFacture);
@@ -412,10 +417,15 @@ module.exports = async (req, res) => {
           addParagraph(doc, "Les données communiquées sont utilisées uniquement pour le traitement de la demande.");
 
           addSectionTitle(doc, "Conditions de paiement");
-          addParagraph(doc, "Le règlement s’effectue uniquement par virement bancaire ou en espèces.");
-          addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
-          addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord spécifique.");
-          addParagraph(doc, "Un acompte peut être demandé avant le début de la prestation.");
+
+addParagraph(doc, "Le règlement peut s’effectuer par PayPal, carte bancaire ou virement bancaire.");
+addParagraph(doc, "Les paiements par chèque ne sont pas acceptés.");
+addParagraph(doc, "Le paiement est exigible en fin de mission, sauf accord spécifique.");
+addParagraph(doc, "Un acompte peut être demandé avant le début de la prestation.");
+         addSectionTitle(doc, "Coordonnées bancaires");
+
+addParagraph(doc, "Titulaire : Proconvoi17");
+addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
           addParagraph(doc, "En cas de retard de paiement, la prestation peut être suspendue ou reportée.");
 
           if (infos) {
