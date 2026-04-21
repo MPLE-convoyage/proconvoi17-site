@@ -297,11 +297,6 @@
       margin-top: 12px;
     }
 
-    .planning-box ul {
-      margin: 8px 0 0;
-      padding-left: 18px;
-    }
-
     .calendar-wrap {
       margin-top: 16px;
       background: #fff;
@@ -671,7 +666,7 @@
       <div class="contact-grid">
         <div class="contact-card">
           <p><strong>Entreprise :</strong> Proconvoi17</p>
-          <p><strong>Nom :</strong> PLE Mickael</p>
+          <p><strong>Nom :</strong> Ton Nom Prénom</p>
           <p><strong>Téléphone :</strong> 07 63 08 26 37</p>
           <p><strong>Email :</strong> <a href="mailto:contact@proconvoi17.fr">contact@proconvoi17.fr</a></p>
         </div>
@@ -706,7 +701,7 @@
     © Proconvoi17 - Tous droits réservés
   </footer>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=EOhC3GQnZIukpuXzlddRf0xeHa1WXPyPSiIfoIi1GjHBWHNAG_tq8GesemCoYZSbQjBvdyVXDhzgPitU&currency=EUR&intent=capture"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID_LIVE_ICI&currency=EUR&intent=capture"></script>
 
   <script>
     const prestation = document.getElementById("prestation");
@@ -738,13 +733,11 @@
     let montantGlobal = 0;
     let numeroFactureGlobal = "";
     let paypalRendered = false;
-
-    // MODIFIE UNIQUEMENT CES DATES SI BESOIN
-   function getDatesIndisponibles() {
-  return JSON.parse(localStorage.getItem("proconvoi17_dates_indisponibles") || "[]");
-}
-
     let currentCalendarDate = new Date();
+
+    function getDatesIndisponibles() {
+      return JSON.parse(localStorage.getItem("proconvoi17_dates_indisponibles") || "[]");
+    }
 
     function getHistoriqueDevis() {
       return JSON.parse(localStorage.getItem("proconvoi17_historique") || "[]");
@@ -844,10 +837,8 @@
         etatDate.textContent = "";
         return true;
       }
-function getDatesIndisponibles() {
-  return JSON.parse(localStorage.getItem("proconvoi17_dates_indisponibles") || "[]");
-}
-      
+
+      if (getDatesIndisponibles().includes(dateChoisie)) {
         etatDate.textContent = "❌ Date indisponible";
         etatDate.style.color = "red";
         return false;
@@ -890,6 +881,8 @@ function getDatesIndisponibles() {
         calendarGrid.appendChild(el);
       });
 
+      const datesIndisponibles = getDatesIndisponibles();
+
       for (let i = 0; i < startDay; i++) {
         const empty = document.createElement("div");
         empty.className = "day-cell empty";
@@ -901,7 +894,7 @@ function getDatesIndisponibles() {
         const cell = document.createElement("div");
         cell.className = "day-cell";
 
-        const isUnavailable = getDatesIndisponibles().includes(dateStr);
+        const isUnavailable = datesIndisponibles.includes(dateStr);
         const isSelected = inputDate.value === dateStr;
 
         if (isUnavailable) {
@@ -918,13 +911,6 @@ function getDatesIndisponibles() {
         cell.textContent = day;
 
         cell.addEventListener("click", () => {
-          if (isUnavailable) {
-            inputDate.value = dateStr;
-            verifierDate();
-            renderCalendar();
-            return;
-          }
-
           inputDate.value = dateStr;
           verifierDate();
           renderCalendar();
