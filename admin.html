@@ -227,8 +227,122 @@
       margin-top: 8px;
     }
 
-    .calendar-card p {
-      margin: 8px 0;
+    .planning-box {
+      background: #f8fafc;
+      border: 1px solid #d9dee7;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .calendar-header h3 {
+      margin: 0;
+      color: #0b1f3a;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day-name,
+    .day-cell {
+      text-align: center;
+      padding: 12px 6px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .day-name {
+      font-weight: bold;
+      background: #eef3f9;
+      color: #0b1f3a;
+      border: 1px solid #d9dee7;
+    }
+
+    .day-cell {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d9dee7;
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .day-cell.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    .day-cell.available {
+      background: #edf8f0;
+      color: #198754;
+      border-color: #bfe0c6;
+    }
+
+    .day-cell.unavailable {
+      background: #fdecec;
+      color: #c62828;
+      border-color: #f1bcbc;
+      font-weight: bold;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #5b6472;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend .dot-available {
+      background: #edf8f0;
+      border: 1px solid #bfe0c6;
+    }
+
+    .legend .dot-unavailable {
+      background: #fdecec;
+      border: 1px solid #f1bcbc;
+    }
+
+    .dates-list {
+      margin-top: 14px;
+      padding-left: 18px;
+    }
+
+    .dates-list li {
+      margin-bottom: 6px;
     }
 
     @media (max-width: 900px) {
@@ -241,9 +355,19 @@
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .stats {
         grid-template-columns: 1fr;
+      }
+
+      .calendar-grid {
+        gap: 5px;
+      }
+
+      .day-name,
+      .day-cell {
+        padding: 10px 4px;
+        font-size: 12px;
       }
     }
   </style>
@@ -266,7 +390,7 @@
     <div class="topbar">
       <div>
         <h1>Admin Proconvoi17</h1>
-        <p class="small">Suivi des devis enregistrés dans ce navigateur</p>
+        <p class="small">Gestion du planning et suivi des devis</p>
       </div>
 
       <div class="actions">
@@ -276,10 +400,30 @@
       </div>
     </div>
 
-    <div class="card calendar-card">
+    <div class="card">
       <h2>Planning</h2>
-      <p>Le planning Google Calendar est désactivé pour le moment.</p>
-      <p class="small">Les dates choisies par les clients apparaissent dans les devis enregistrés.</p>
+      <div class="planning-box">
+        <p class="small">Clique sur une date pour la rendre indisponible ou disponible.</p>
+
+        <div class="calendar-header">
+          <h3 id="calendarMonthTitle">Planning</h3>
+          <div class="calendar-nav">
+            <button type="button" id="prevMonthBtn">◀</button>
+            <button type="button" id="nextMonthBtn">▶</button>
+            <button type="button" class="danger" onclick="viderDatesIndisponibles()">Vider les dates</button>
+          </div>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
+
+        <div class="legend">
+          <span><i class="dot-available"></i> Disponible</span>
+          <span><i class="dot-unavailable"></i> Indisponible</span>
+        </div>
+
+        <h3 style="margin-top:20px;">Dates indisponibles</h3>
+        <ul id="datesIndisponiblesList" class="dates-list"></ul>
+      </div>
     </div>
 
     <div class="stats">
@@ -310,6 +454,15 @@
   <script>
     const ADMIN_PASSWORD = "Margaux-17";
     const SESSION_KEY = "proconvoi17_admin_logged";
+    const DATES_STORAGE_KEY = "proconvoi17_dates_indisponibles";
+
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarMonthTitle = document.getElementById("calendarMonthTitle");
+    const datesIndisponiblesList = document.getElementById("datesIndisponiblesList");
+    const prevMonthBtn = document.getElementById("prevMonthBtn");
+    const nextMonthBtn = document.getElementById("nextMonthBtn");
+
+    let currentCalendarDate = new Date();
 
     function verifierMotDePasse() {
       const input = document.getElementById("adminPassword").value;
@@ -326,6 +479,8 @@
     function afficherAdmin() {
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("adminScreen").classList.remove("hidden");
+      renderCalendar();
+      renderDatesList();
       afficherHistorique();
     }
 
@@ -340,6 +495,14 @@
 
     function sauvegarderHistorique(historique) {
       localStorage.setItem("proconvoi17_historique", JSON.stringify(historique));
+    }
+
+    function getDatesIndisponibles() {
+      return JSON.parse(localStorage.getItem(DATES_STORAGE_KEY) || "[]");
+    }
+
+    function saveDatesIndisponibles(dates) {
+      localStorage.setItem(DATES_STORAGE_KEY, JSON.stringify(dates));
     }
 
     function formatDate(dateStr) {
@@ -386,6 +549,15 @@
       afficherHistorique();
     }
 
+    function viderDatesIndisponibles() {
+      const ok = confirm("Voulez-vous vraiment supprimer toutes les dates indisponibles ?");
+      if (!ok) return;
+
+      localStorage.removeItem(DATES_STORAGE_KEY);
+      renderCalendar();
+      renderDatesList();
+    }
+
     function calculerStats(historique) {
       const total = historique.length;
       const payes = historique.filter(item => item.statutPaiement === "payé").length;
@@ -397,6 +569,99 @@
       document.getElementById("statAttente").textContent = attente;
       document.getElementById("statMontant").textContent = montant.toFixed(2) + " €";
     }
+
+    function formatDateForInput(year, month, day) {
+      return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+
+    function toggleDate(dateStr) {
+      const dates = getDatesIndisponibles();
+      const index = dates.indexOf(dateStr);
+
+      if (index >= 0) {
+        dates.splice(index, 1);
+      } else {
+        dates.push(dateStr);
+      }
+
+      dates.sort();
+      saveDatesIndisponibles(dates);
+      renderCalendar();
+      renderDatesList();
+    }
+
+    function renderDatesList() {
+      const dates = getDatesIndisponibles();
+
+      if (!dates.length) {
+        datesIndisponiblesList.innerHTML = "<li>Aucune date indisponible.</li>";
+        return;
+      }
+
+      datesIndisponiblesList.innerHTML = dates
+        .map(date => `<li>${date}</li>`)
+        .join("");
+    }
+
+    function renderCalendar() {
+      const year = currentCalendarDate.getFullYear();
+      const month = currentCalendarDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      let startDay = firstDay.getDay();
+      startDay = startDay === 0 ? 6 : startDay - 1;
+
+      const monthLabel = firstDay.toLocaleDateString("fr-FR", {
+        month: "long",
+        year: "numeric"
+      });
+
+      calendarMonthTitle.textContent =
+        monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+
+      const datesIndisponibles = getDatesIndisponibles();
+
+      calendarGrid.innerHTML = "";
+
+      const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+      dayNames.forEach((name) => {
+        const el = document.createElement("div");
+        el.className = "day-name";
+        el.textContent = name;
+        calendarGrid.appendChild(el);
+      });
+
+      for (let i = 0; i < startDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day-cell empty";
+        calendarGrid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = formatDateForInput(year, month, day);
+        const cell = document.createElement("div");
+        const isUnavailable = datesIndisponibles.includes(dateStr);
+
+        cell.className = `day-cell ${isUnavailable ? "unavailable" : "available"}`;
+        cell.textContent = day;
+        cell.title = dateStr;
+        cell.addEventListener("click", () => toggleDate(dateStr));
+
+        calendarGrid.appendChild(cell);
+      }
+    }
+
+    prevMonthBtn.addEventListener("click", () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+      renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener("click", () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+      renderCalendar();
+    });
 
     function afficherHistorique() {
       const content = document.getElementById("content");
