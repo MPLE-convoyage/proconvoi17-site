@@ -619,7 +619,7 @@
 
         <div class="full planning-box">
           <strong>Planning</strong>
-          <p class="small">Choisissez une date libre dans le calendrier ci-dessous.</p>
+          <p class="small">Choisissez votre date. La disponibilité est vérifiée avec Google Calendar.</p>
 
           <div class="calendar-wrap">
             <div class="calendar-header">
@@ -633,8 +633,7 @@
             <div id="calendarGrid" class="calendar-grid"></div>
 
             <div class="legend">
-              <span><i class="dot-available"></i> Disponible</span>
-              <span><i class="dot-unavailable"></i> Indisponible</span>
+              <span><i class="dot-available"></i> Date cliquable</span>
               <span><i class="dot-selected"></i> Date choisie</span>
             </div>
           </div>
@@ -735,10 +734,6 @@
     let paypalRendered = false;
     let currentCalendarDate = new Date();
 
-    function getDatesIndisponibles() {
-      return JSON.parse(localStorage.getItem("proconvoi17_dates_indisponibles") || "[]");
-    }
-
     function getHistoriqueDevis() {
       return JSON.parse(localStorage.getItem("proconvoi17_historique") || "[]");
     }
@@ -830,7 +825,7 @@
       return montant;
     }
 
-    function verifierDate() {
+    async function verifierDate() {
       const dateChoisie = inputDate.value;
 
       if (!dateChoisie) {
@@ -838,15 +833,30 @@
         return true;
       }
 
-      if (getDatesIndisponibles().includes(dateChoisie)) {
-        etatDate.textContent = "❌ Date indisponible";
+      try {
+        const res = await fetch(`/api/calendar/check-date?date=${dateChoisie}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          etatDate.textContent = "Erreur de vérification du planning";
+          etatDate.style.color = "red";
+          return false;
+        }
+
+        if (data.unavailable) {
+          etatDate.textContent = "❌ Date indisponible";
+          etatDate.style.color = "red";
+          return false;
+        } else {
+          etatDate.textContent = "✅ Date disponible";
+          etatDate.style.color = "green";
+          return true;
+        }
+      } catch (error) {
+        etatDate.textContent = "Erreur de vérification du planning";
         etatDate.style.color = "red";
         return false;
       }
-
-      etatDate.textContent = "✅ Date disponible";
-      etatDate.style.color = "green";
-      return true;
     }
 
     function formatDateForInput(year, month, day) {
@@ -881,8 +891,6 @@
         calendarGrid.appendChild(el);
       });
 
-      const datesIndisponibles = getDatesIndisponibles();
-
       for (let i = 0; i < startDay; i++) {
         const empty = document.createElement("div");
         empty.className = "day-cell empty";
@@ -892,19 +900,11 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = formatDateForInput(year, month, day);
         const cell = document.createElement("div");
-        cell.className = "day-cell";
+        cell.className = "day-cell available";
 
-        const isUnavailable = datesIndisponibles.includes(dateStr);
         const isSelected = inputDate.value === dateStr;
-
-        if (isUnavailable) {
-          cell.classList.add("unavailable");
-        } else {
-          cell.classList.add("available");
-        }
-
         if (isSelected) {
-          cell.classList.remove("available", "unavailable");
+          cell.classList.remove("available");
           cell.classList.add("selected");
         }
 
@@ -998,7 +998,7 @@
       }).render("#paypal-button-container");
     }
 
-    calculerBtn.addEventListener("click", () => {
+    calculerBtn.addEventListener("click", async () => {
       const nom = document.getElementById("nom").value.trim();
       const email = document.getElementById("email").value.trim();
 
@@ -1007,7 +1007,7 @@
         return;
       }
 
-      const dateDisponible = verifierDate();
+      const dateDisponible = await verifierDate();
 
       if (!dateDisponible) {
         alert("Cette date est indisponible. Merci d'en choisir une autre.");
@@ -1086,8 +1086,8 @@
 
     prestation.addEventListener("change", toggleFields);
     modeFacturation.addEventListener("change", toggleFields);
-    inputDate.addEventListener("change", () => {
-      verifierDate();
+    inputDate.addEventListener("change", async () => {
+      await verifierDate();
       renderCalendar();
     });
 
