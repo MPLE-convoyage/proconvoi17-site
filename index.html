@@ -522,11 +522,11 @@
       <div class="tarif-list">
         <div class="tarif-item">
           <strong>Convoyage VL</strong>
-          1,O6 €/km + 26% de frais de route – minimum 90 €
+          1.O6 €/km + 26% de frais de route – minimum 90 €
         </div>
         <div class="tarif-item">
           <strong>Convoyage PL / SPL</strong>
-          2,40 €/km + 26% de frais de route – minimum 90 €
+          2.40 €/km + 26% de frais de route – minimum 90 €
         </div>
         <div class="tarif-item">
           <strong>Conducteur PL / SPL</strong>
@@ -573,8 +573,8 @@
         <div id="vehiculeBloc">
           <label for="vehicule">Type de véhicule</label>
           <select id="vehicule">
-            <option value="vl">VL - 1,06 €/km</option>
-            <option value="pl">PL / SPL - 2,40 €/km</option>
+            <option value="vl">VL - 1.06 €/km</option>
+            <option value="pl">PL / SPL - 2.40 €/km</option>
           </select>
         </div>
 
@@ -799,7 +799,7 @@
       if (prestation.value === "convoyage") {
         const distance = parseFloat(document.getElementById("distance").value) || 0;
         const vehicule = document.getElementById("vehicule").value;
-        const tarifKm = vehicule === "vl" ? 1,06 : 2.40;
+        const tarifKm = vehicule === "vl" ? 1.06 : 2.40;
 
         montant = distance * tarifKm;
         montant += montant * 0.26;
