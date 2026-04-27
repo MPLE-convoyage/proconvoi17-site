@@ -317,9 +317,9 @@ module.exports = async (req, res) => {
               doc,
               "Type de véhicule",
               vehicule === "vl"
-                ? "VL - 0,98 €/km"
+                ? "VL - 1,06 €/km"
                 : vehicule === "pl"
-                ? "PL / SPL - 2,20 €/km"
+                ? "PL / SPL - 2,40 €/km"
                 : vehicule
             );
             addFieldRow(doc, "Distance", distance ? `${distance} km` : "-");
@@ -399,9 +399,9 @@ addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
               doc,
               "Type de véhicule",
               vehicule === "vl"
-                ? "VL - 0,98 €/km"
+                ? "VL - 1.06 €/km"
                 : vehicule === "pl"
-                ? "PL / SPL - 2,20 €/km"
+                ? "PL / SPL - 2,40 €/km"
                 : vehicule
             );
             addFieldRow(doc, "Distance prévue", distance ? `${distance} km` : "-");
