@@ -324,7 +324,7 @@
 
         <div class="tarif-item">
           <strong>Conducteur PL / SPL</strong>
-          320 € / jour (amplitude maximale 12h)<br>
+          340 € / jour (amplitude maximale 12h)<br>
           32 € / heure (minimum 3h)<br>
           Forfait nuit à partir de 380 €<br>
           Minimum de facturation : 100 €<br>
@@ -596,7 +596,7 @@ Des contrats cadres et prestations régulières peuvent être proposés sur devi
 
         if (modeFacturation.value === "journee") {
           const jours = parseFloat(document.getElementById("jours").value) || 0;
-          montant = (jours * 320) + (decouches * 90);
+          montant = (jours * 340) + (decouches * 90);
         } else if (modeFacturation.value === "nuit") {
           const jours = parseFloat(document.getElementById("jours").value) || 0;
           montant = (jours * 380) + (decouches * 90);
