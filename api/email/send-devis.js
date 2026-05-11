@@ -306,7 +306,7 @@ module.exports = async (req, res) => {
               addFieldRow(doc, "Nombre d'heures", heures);
             } else {
               addFieldRow(doc, "Mode de facturation", "Forfait journée");
-              addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+              addFieldRow(doc, "Tarif journalier", "340 € / jour (max 12h)");
               addFieldRow(doc, "Nombre de jours", jours);
             }
             addFieldRow(doc, "Découché", "90 €");
@@ -388,7 +388,7 @@ addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
               addFieldRow(doc, "Nombre d'heures", heures);
             } else {
               addFieldRow(doc, "Mode de facturation", "Forfait journée");
-              addFieldRow(doc, "Tarif journalier", "320 € / jour (12h)");
+              addFieldRow(doc, "Tarif journalier", "340 € / jour (12h)");
               addFieldRow(doc, "Nombre de jours", jours);
             }
             addFieldRow(doc, "Découché", "90 €");
