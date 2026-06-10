@@ -314,19 +314,19 @@
       <div class="tarif-list">
         <div class="tarif-item">
           <strong>Convoyage VL</strong>
-          1,06 €/km + 26% de frais de route – minimum 90 €
+          1,16 €/km tout compris – minimum 90 €
         </div>
 
         <div class="tarif-item">
           <strong>Convoyage PL / SPL</strong>
-          2,40 €/km + 26% de frais de route – minimum 90 €
+          2,20 €/km tout compris  – minimum 90 €
         </div>
 
         <div class="tarif-item">
           <strong>Conducteur PL / SPL</strong>
-          340 € / jour (amplitude maximale 12h)<br>
+          280 € / jour (amplitude maximale 12h)<br>
           32 € / heure (minimum 3h)<br>
-          Forfait nuit à partir de 380 €<br>
+          Forfait nuit à partir de 360 €<br>
           Minimum de facturation : 100 €<br>
           + 90 € / découché
         </div>
@@ -368,8 +368,8 @@
         <div id="vehiculeBloc">
           <label for="vehicule">Type de véhicule</label>
           <select id="vehicule">
-            <option value="vl">VL - 1,06 €/km + 26%</option>
-            <option value="pl">PL / SPL - 2,40 €/km + 26%</option>
+            <option value="vl">VL - 1,16 €/km </option>
+            <option value="pl">PL / SPL - 2,20 €/km </option>
           </select>
         </div>
 
@@ -464,8 +464,8 @@
 
       <p><strong>1. Objet :</strong> Les présentes CGV régissent les prestations de convoyage de véhicules et de mise à disposition de conducteur poids lourd / super poids lourd réalisées par Proconvoi17.</p>
 
-      <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros. Pour les prestations de convoyage, un forfait de 26 % est appliqué en complément du tarif kilométrique. Ce forfait correspond à une participation aux frais de mission et comprend notamment les frais de déplacement du conducteur, carburant, péages, transport retour, charges professionnelles et frais d’exploitation. Aucun frais supplémentaire ne sera appliqué sans accord préalable du client.</p>
-
+      <p><strong>2. Tarifs :</strong> Les prix sont exprimés en euros. Pour les prestations de convoyage. 
+        
       <p><strong>3. Conducteur PL / SPL :</strong> Les prestations de mise à disposition de conducteur sont facturées selon un tarif journalier, horaire ou forfaitaire, notamment de nuit. Le tarif journalier correspond à une amplitude maximale de 12 heures. Les missions courtes peuvent être facturées à l’heure avec un minimum de 3 heures. Un minimum de facturation de 100 € s’applique. Les découchés sont facturés 90 €.</p>
 
       <p><strong>4. Contrats spécifiques :</strong> Certaines prestations régulières ou longue durée peuvent faire l’objet d’un contrat ou d’une tarification spécifique établie sur devis.</p>
@@ -583,10 +583,10 @@
       if (prestation.value === "convoyage") {
         const distance = parseFloat(document.getElementById("distance").value) || 0;
         const vehicule = document.getElementById("vehicule").value;
-        const tarifKm = vehicule === "vl" ? 1.06 : 2.40;
+        const tarifKm = vehicule === "vl" ? 1.16 : 2.20;
 
         montant = distance * tarifKm;
-        montant += montant * 0.26;
+        
 
         if (montant < 90) montant = 90;
       } else {
@@ -594,10 +594,10 @@
 
         if (modeFacturation.value === "journee") {
           const jours = parseFloat(document.getElementById("jours").value) || 0;
-          montant = (jours * 340) + (decouches * 90);
+          montant = (jours * 280) + (decouches * 90);
         } else if (modeFacturation.value === "nuit") {
           const jours = parseFloat(document.getElementById("jours").value) || 0;
-          montant = (jours * 380) + (decouches * 90);
+          montant = (jours * 360) + (decouches * 90);
         } else {
           let heures = parseFloat(document.getElementById("heures").value) || 0;
           if (heures < 3) heures = 3;
