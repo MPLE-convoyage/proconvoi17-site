@@ -306,7 +306,7 @@ module.exports = async (req, res) => {
               addFieldRow(doc, "Nombre d'heures", heures);
             } else {
               addFieldRow(doc, "Mode de facturation", "Forfait journée");
-              addFieldRow(doc, "Tarif journalier", "340 € / jour (max 12h)");
+              addFieldRow(doc, "Tarif journalier", "280 € / jour (max 12h)");
               addFieldRow(doc, "Nombre de jours", jours);
             }
             addFieldRow(doc, "Découché", "90 €");
@@ -317,9 +317,9 @@ module.exports = async (req, res) => {
               doc,
               "Type de véhicule",
               vehicule === "vl"
-                ? "VL - 1,06 €/km"
+                ? "VL - 1,16 €/km"
                 : vehicule === "pl"
-                ? "PL / SPL - 2,40 €/km"
+                ? "PL / SPL - 2,20 €/km"
                 : vehicule
             );
             addFieldRow(doc, "Distance", distance ? `${distance} km` : "-");
@@ -388,7 +388,7 @@ addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
               addFieldRow(doc, "Nombre d'heures", heures);
             } else {
               addFieldRow(doc, "Mode de facturation", "Forfait journée");
-              addFieldRow(doc, "Tarif journalier", "340 € / jour (12h)");
+              addFieldRow(doc, "Tarif journalier", "280 € / jour (12h)");
               addFieldRow(doc, "Nombre de jours", jours);
             }
             addFieldRow(doc, "Découché", "90 €");
@@ -399,9 +399,9 @@ addParagraph(doc, "IBAN : FR76 1741 8000 0100 0119 7648 561");
               doc,
               "Type de véhicule",
               vehicule === "vl"
-                ? "VL - 1.06 €/km"
+                ? "VL - 1.16 €/km"
                 : vehicule === "pl"
-                ? "PL / SPL - 2,40 €/km"
+                ? "PL / SPL - 2,20 €/km"
                 : vehicule
             );
             addFieldRow(doc, "Distance prévue", distance ? `${distance} km` : "-");
